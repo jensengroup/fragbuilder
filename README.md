@@ -38,3 +38,13 @@ import fragbuilder
 
 6) There is not much documentation at this point
 
+
+How to cite use of fragbuilder:
+===============================
+Do something like this:
+"fragbuilder" (2013) Anders S. Christensen, Jan H. Jensen, https://github.com/andersx/fragbuilder 
+There will be a proper paper on arXiv shortly.
+
+Licensing
+=========
+fragbuilder is licensed under the two-clause BSD license which mean you can pretty much do whatever you want as long as you cite properly and/or mentions the name of the authors.
