@@ -22,30 +22,30 @@
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
+import numpy
+import openbabel
+import pybel
 
-# Required external modules
-import os
-import sys
-import numpy as np
 
 # Required internal modules
-from residues import *
-from math_utils import *
-from names import *
-from peptide import *
-from pdb_tools import *
+from src.residues import *
+from src.math_utils import *
+from src.names import *
+from src.peptide import *
+from src.pdb_tools import *
 
-# Optional internal modules
-from basilisk_wrapper import *
-from backbonedbn_wrapper import *
-from gaussian09_wrapper import *
+# Optional internal modules (disable selectively if you get errors)
+from src.basilisk_wrapper import *
+from src.backbonedbn_wrapper import *
+from src.gaussian09_wrapper import *
 
-
+# Import user settings
+from settings import *
 
 if __name__ == "__main__":
 
     #TODO: Implement some basic tests.
-    print "You can't run this file"
+    print "You can't run this file. All modules loaded without any errors"
 
 
 

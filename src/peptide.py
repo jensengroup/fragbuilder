@@ -1,6 +1,14 @@
+import os
+import uuid
+
+from residues import *
+from math_utils import *
+
 def initialize_bb_angles(residues):
 
 	raise NotImplementedError
+
+
 
 def RotateAwesomeMol(AwesomeMol, Axis, Center, Angle):
 #       print AwesomeMol
@@ -523,7 +531,6 @@ class peptide:
 			Fragment[-1].AwesomeMol[0][1] = CO - (NH - CA) * 0.8
 
 	
-		import uuid
 		uid = uuid.uuid4()
 		temp_xyz = uid.hex  + ".xyz"
 	        file_out = open(temp_xyz, "w")

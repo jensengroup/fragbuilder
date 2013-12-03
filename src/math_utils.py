@@ -23,6 +23,7 @@
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE# Unit vector normal to two vectors
 
 import numpy as np
+import math
 
 def normalvector(v1, v2):
     J = np.cross(v1, v2)
@@ -71,10 +72,10 @@ def dihedral(a,b,c,d):
     b1 = b - a
     b2 = c - b
     b3 = d - c
-    rb2 =math.sqrt(numpy.dot(b2,b2))
-    b2xb3 = numpy.cross(b2,b3)
-    b1xb2 = numpy.cross(b1,b2)
-    dihedral = math.atan2( numpy.dot(rb2*b1,b2xb3), numpy.dot(b1xb2,b2xb3) )
+    rb2 = np.sqrt(np.dot(b2,b2))
+    b2xb3 = np.cross(b2,b3)
+    b1xb2 = np.cross(b1,b2)
+    dihedral = math.atan2( np.dot(rb2*b1,b2xb3), np.dot(b1xb2,b2xb3) )
     return dihedral
 
 
@@ -89,7 +90,11 @@ def rotate(V, J, T):
     a = (u*(u*x + v*y + w*z) + (x * (v*v + w*w) - u *(v*y + w*z))*math.cos(T) + math.sqrt(u*u + v*v + w*w)*(-w*y + v*z)*math.sin(T))/(u*u + v*v + w*w)
     b = (v*(u*x + v*y + w*z) + (y * (u*u + w*w) - v *(u*x + w*z))*math.cos(T) + math.sqrt(u*u + v*v + w*w)*(w*x - u*z)*math.sin(T))/(u*u + v*v + w*w)
     c = (w*(u*x + v*y + w*z) + (z * (u*u + v*v) - w *(u*x + v*y))*math.cos(T) + math.sqrt(u*u + v*v + w*w)*(-v*x + u*y)*math.sin(T))/(u*u + v*v + w*w)
-    return numpy.array([a, b, c])
+    return np.array([a, b, c])
+
+def to_rad(degrees):
+    degrees = float(degrees)
+    return degrees/180.0*math.pi
 
 
 

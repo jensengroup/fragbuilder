@@ -1,4 +1,25 @@
+import pybel
+import string
+import numpy
+
 from settings import *
+
+def ReadCoordzAwesome(Filename):
+        ThisAwesomeMol = []
+        XYZFile = open(Filename,"r")
+        for Line in XYZFile:
+                if (len(string.split(Line)) == 4):
+                        Type = string.split(Line)[0]
+                        X = float(string.split(Line)[1])
+                        Y = float(string.split(Line)[2])
+                        Z = float(string.split(Line)[3])
+                        Coords = numpy.array([X,Y,Z])
+                        Element = [Type, Coords]
+                        ThisAwesomeMol.append(Element)
+#       print ThisAwesomeMol
+        return ThisAwesomeMol
+
+
 
 class LeftMethylCap:
     Charge      = 0

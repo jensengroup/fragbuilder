@@ -184,11 +184,11 @@ def read_angles(filename):
 	dbn = TorusDBN(pdb_filename=filename, input_aa=True, input_angles=True)
 	phipsi_angles = dbn.get_angles()
 	
-	os.system("cp " + filename + " tmp.pdb")
-	os.system("sh /home/andersx/programs/fragbuilder/dssp_torsome.sh 2>/dev/null")
-	dssp_file = os.popen("cat tmp.sec")
-	dssp = dssp_file.readlines()[0]
-	dssp_file.close()
+	#os.system("cp " + filename + " tmp.pdb")
+	#os.system("sh /home/andersx/programs/fragbuilder/dssp_torsome.sh 2>/dev/null")
+	#dssp_file = os.popen("cat tmp.sec")
+	#dssp = dssp_file.readlines()[0]
+	#dssp_file.close()
 	
 	first_residue_id = 0
 	for model in structure[0]:
@@ -208,7 +208,7 @@ def read_angles(filename):
 
 				angles_dictionary[residue.get_id()[1]]['res_name'] = residue.get_resname()
 				angles_dictionary[residue.get_id()[1]]['res_letter'] = three_to_one(residue.get_resname())
-				angles_dictionary[residue.get_id()[1]]['DSSP'] = dssp[residue.get_id()[1]-1-first_residue_id]
+				#angles_dictionary[residue.get_id()[1]]['DSSP'] = dssp[residue.get_id()[1]-1-first_residue_id]
 
 				phi = phipsi_angles[residue.get_id()[1]-first_residue_id][0]*180/math.pi
 				psi = phipsi_angles[residue.get_id()[1]-first_residue_id][1]*180/math.pi
