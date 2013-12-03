@@ -1,4 +1,5 @@
 import os
+import openbabel
 import uuid
 
 from residues import *
@@ -570,44 +571,123 @@ class peptide:
 		                mol.OBMol.SetTorsion(NH1, CA1, CO1, NH2, 140.0/180.0*math.pi)
 			except:
 				temp = 0
-#				print self._state_nterm
 		
 		os.remove(temp_xyz)
-#		print Fragment
 	
 		return mol
 
-#self._hbonds = []
 
 
-	def get_residue_nr(atom_nr):
-		correct_residue_nr = 0
-		nr_of_atoms_up_to_this_residues = 0
+        def get_residue_nr(atom_nr):
+            correct_residue_nr = 0
+            nr_of_atoms_up_to_this_residues = 0
 
-		for i, residue in enumerate(self._residues):
-			nr_of_atoms_up_to_this_residues += self._get_residue_length(residue)
-			if atom_nr <= nr_of_atoms_up_to_this_residues:
-				return 
-		print "ERROR: Atom nr", atom_nr, "not found.", nr_of_atoms_up_to_this_residues," in molecule."
-		exit(1)
+            for i, residue in enumerate(self._residues):
+                nr_of_atoms_up_to_this_residues += self._get_residue_length(residue)
+                if atom_nr <= nr_of_atoms_up_to_this_residues:
+                    return 
+            print "ERROR: Atom nr", atom_nr, "not found.", nr_of_atoms_up_to_this_residues," in molecule."
+            exit(1)
 
-	def print_molecule(self):
-		print self._molecule	
+        def print_molecule(self):
+            print self._molecule	
 
 
-	def add_hbond(self, res_no, atom_type, bonding_partner):
+        def add_hbond(self, res_no, atom_type, bonding_partner):
 #		if atom_type == "HA":
 #			
 #		elif atom_type == "HN":
 #		elif atom_type == "OC"
 
 
-		raise NotImplementedError
+            raise NotImplementedError
 
 
-	def set_hbond_geom(r_oh, theta, rho):
-		
-		raise NotImplementedError
+        def set_hbond_geom(r_oh, theta, rho):
+            
+            raise NotImplementedError
+
+
+        def get_dihedral_constraints(self):
+
+            restraints = []
+
+            backbone_chain = []
+
+            offset = 0
+
+            for i, residue in enumerate(self._residues):
+                atoms_in_residue = self._get_residue_length(residue)
+                for atom in residue.BB:
+                    backbone_chain.append(atom + offset)
+                offset += atoms_in_residue
+
+            backbone_chain.sort()
+
+
+
+            for i in range(len(backbone_chain)-3):
+
+                local_restraint = []
+
+                for j in range(4):
+                     local_restraint.append(backbone_chain[i+j])
+                restraints.append(local_restraint)
+
+            offset = 0
+
+            for i, residue in enumerate(self._residues):
+                atoms_in_residue = self._get_residue_length(residue)
+
+                for dihedral in residue.SC:
+                    local_restraint = []
+
+                    for atom_index in dihedral:
+                        local_restraint.append(atom_index + offset)
+                    restraints.append(local_restraint)
+                offset += atoms_in_residue
+
+
+            return restraints
+
+        def regularize(self, iterations=10, opt_steps = 20):
+
+            restraints = self.get_dihedral_constraints()
+            a = []
+
+            for r in restraints:
+                angle = self._molecule.OBMol.GetTorsion(r[0], r[1], r[2], r[3])
+                a.append(angle)
+
+            for i in range(iterations):
+                self.optimize(constraint=True, steps= opt_steps)
+                for i, r in enumerate(restraints):
+                    self._molecule.OBMol.SetTorsion(r[0], r[1], r[2], r[3], a[i]/180.0*numpy.pi)
+            return
+
+
+
+
+        def optimize(self, constraint=True, steps=100):
+            mol = self._molecule.OBMol
+
+            restraints = self.get_dihedral_constraints()
+
+            cnstr = openbabel.OBFFConstraints()
+
+            for r in restraints:
+                a = mol.GetTorsion(r[0], r[1], r[2], r[3])
+                cnstr.AddTorsionConstraint(r[0], r[1], r[2], r[3], a)
+
+            FF = openbabel.OBForceField.FindForceField("MMFF94")
+            FF.Setup(mol, cnstr)
+            FF.SetConstraints(cnstr)
+            FF.ConjugateGradients(steps)
+            FF.GetCoordinates(mol)
+
+
+
+
 
 
 
