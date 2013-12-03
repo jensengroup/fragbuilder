@@ -25,14 +25,14 @@
 import numpy as np
 
 def normalvector(v1, v2):
-        J = np.cross(v1, v2)
-        return J/(np.sqrt(np.dot(J, J)))
+    J = np.cross(v1, v2)
+    return J/(np.sqrt(np.dot(J, J)))
 
 # Vector perpendicular to (v1-v2) and (v3-v2) centered in v2.
 def perp_vector(v1, v2, v3):
-        J = np.cross(v2 - v3, v2 - v1) + v2
-        J = (J - v2) /(np.sqrt(np.dot(J - v2, J - v2))) + v2
-        return J
+    J = np.cross(v2 - v3, v2 - v1) + v2
+    J = (J - v2) /(np.sqrt(np.dot(J - v2, J - v2))) + v2
+    return J
 
 
 # Bond angle between three coordinates
@@ -47,9 +47,9 @@ def bondangle(a,b,c):
     dot_product = np.dot(v1,v2)
 
     if dot_product > acos_out_of_bound:
-        dot_product = acos_out_of_bound·
+        dot_product = acos_out_of_bound
     if dot_product < -1.0 * acos_out_of_bound:
-        dot_product = -1.0 * acos_out_of_bound·
+        dot_product = -1.0 * acos_out_of_bound
 
     return np.arccos(dot_product)
 
@@ -68,28 +68,28 @@ def length(v1):
 
 # Dihedral angle between three points in space
 def dihedral(a,b,c,d):
-        b1 = b - a
-        b2 = c - b
-        b3 = d - c
-        rb2 =math.sqrt(numpy.dot(b2,b2))
-        b2xb3 = numpy.cross(b2,b3)
-        b1xb2 = numpy.cross(b1,b2)
-        dihedral = math.atan2( numpy.dot(rb2*b1,b2xb3), numpy.dot(b1xb2,b2xb3) )
-        return dihedral
+    b1 = b - a
+    b2 = c - b
+    b3 = d - c
+    rb2 =math.sqrt(numpy.dot(b2,b2))
+    b2xb3 = numpy.cross(b2,b3)
+    b1xb2 = numpy.cross(b1,b2)
+    dihedral = math.atan2( numpy.dot(rb2*b1,b2xb3), numpy.dot(b1xb2,b2xb3) )
+    return dihedral
 
 
 # Rotate a set of vectors
 def rotate(V, J, T):
-        x = V[0]
-        y = V[1]
-        z = V[2]
-        u = J[0]
-        v = J[1]
-        w = J[2]
-        a = (u*(u*x + v*y + w*z) + (x * (v*v + w*w) - u *(v*y + w*z))*math.cos(T) + math.sqrt(u*u + v*v + w*w)*(-w*y + v*z)*math.sin(T))/(u*u + v*v + w*w)
-        b = (v*(u*x + v*y + w*z) + (y * (u*u + w*w) - v *(u*x + w*z))*math.cos(T) + math.sqrt(u*u + v*v + w*w)*(w*x - u*z)*math.sin(T))/(u*u + v*v + w*w)
-        c = (w*(u*x + v*y + w*z) + (z * (u*u + v*v) - w *(u*x + v*y))*math.cos(T) + math.sqrt(u*u + v*v + w*w)*(-v*x + u*y)*math.sin(T))/(u*u + v*v + w*w)
-        return numpy.array([a, b, c])
+    x = V[0]
+    y = V[1]
+    z = V[2]
+    u = J[0]
+    v = J[1]
+    w = J[2]
+    a = (u*(u*x + v*y + w*z) + (x * (v*v + w*w) - u *(v*y + w*z))*math.cos(T) + math.sqrt(u*u + v*v + w*w)*(-w*y + v*z)*math.sin(T))/(u*u + v*v + w*w)
+    b = (v*(u*x + v*y + w*z) + (y * (u*u + w*w) - v *(u*x + w*z))*math.cos(T) + math.sqrt(u*u + v*v + w*w)*(w*x - u*z)*math.sin(T))/(u*u + v*v + w*w)
+    c = (w*(u*x + v*y + w*z) + (z * (u*u + v*v) - w *(u*x + v*y))*math.cos(T) + math.sqrt(u*u + v*v + w*w)*(-v*x + u*y)*math.sin(T))/(u*u + v*v + w*w)
+    return numpy.array([a, b, c])
 
 
 

@@ -30,17 +30,15 @@ import numpy as np
 
 # Required internal modules
 from residues import *
+from math_utils import *
+from names import *
+from peptide import *
+from pdb_tools import *
 
 # Optional internal modules
-
-# TODO: BASILISK wrapper
-# from basilisk_wrapper import *
-
-# TODO: BASILISK wrapper
-# from backbonedbn_wrapper import *
-
-# TODO: GAUSSIAN 09 WRAPPER
-# from g09_wrapper import *
+from basilisk_wrapper import *
+from backbonedbn_wrapper import *
+from gaussian09_wrapper import *
 
 
 

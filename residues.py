@@ -1,3 +1,5 @@
+from settings import *
+
 class LeftMethylCap:
     Charge      = 0
     Index       = 23
@@ -470,5 +472,27 @@ class Valine:
     def __init__(self):
         self.Mol = pybel.readfile("xyz", self.Filename).next()
         self.AwesomeMol = ReadCoordzAwesome(self.Filename)
+
+# Dictionary of amino acids and their constructors
+aa_dictionary = dict([('G', Glycine       ),
+              ('A', Alanine       ),
+                      ('S', Serine        ),
+                      ('T', Threonine     ),
+                      ('C', Cysteine      ),
+                      ('V', Valine        ),
+                      ('L', Leucine       ),
+                      ('I', Isoleucine    ),
+                      ('M', Methionine    ),
+                      ('P', Proline       ),
+                      ('F', Phenylalanine ),
+                      ('Y', Tyrosine      ),
+                      ('W', Tryptophan    ),
+                      ('D', Aspartate     ),
+                      ('E', Glutamate     ),
+                      ('N', Aspargine     ),
+                      ('Q', Glutamine     ),
+                      ('H', Histidine     ),
+                      ('K', Lysine        ),
+                      ('R', Arginine      )])
 
 

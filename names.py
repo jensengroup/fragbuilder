@@ -81,26 +81,3 @@ def one_to_three(s):
     "Amino acid single letter to three letter (eg A to ALA)"
     i=d1_to_index[s]
 
-# Dictionary of amino acids and their constructors
-aa_dictionary = dict([('G', Glycine       ),
-              ('A', Alanine       ),
-                      ('S', Serine        ),
-                      ('T', Threonine     ),
-                      ('C', Cysteine      ),
-                      ('V', Valine        ),
-                      ('L', Leucine       ),
-                      ('I', Isoleucine    ),
-                      ('M', Methionine    ),
-                      ('P', Proline       ),
-                      ('F', Phenylalanine ),
-                      ('Y', Tyrosine      ),
-                      ('W', Tryptophan    ),
-                      ('D', Aspartate     ),
-                      ('E', Glutamate     ),
-                      ('N', Aspargine     ),
-                      ('Q', Glutamine     ),
-                      ('H', Histidine     ),
-                      ('K', Lysine        ),
-                      ('R', Arginine      )])
-
-
