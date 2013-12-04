@@ -1,3 +1,12 @@
+import math
+
+import Bio.PDB
+from Bio.PDB import calc_dihedral
+
+from names import *
+
+
+
 def get_chi(residue):
         if residue.get_resname() == 'ALA':
                 return []
@@ -177,51 +186,69 @@ def get_chi(residue):
                 return "FAILLLL"
 
 
+def get_first_chain(filename):
+    parser = Bio.PDB.PDBParser(QUIET=True)
+    structure = parser.get_structure("pdb", filename)
+
+    for model in structure:
+        for chain in model:
+            return chain
+
+def read_phi_psi(chain):
+    polypeptides = Bio.PDB.PPBuilder().build_peptides(chain)
+
+    for poly_index, poly in enumerate(polypeptides):
+        return poly.get_phi_psi_list()
+
+
+
+
 def read_angles(filename):
+    """ Returns a dictionary with the following format:
 
-	parser=PDBParser(QUIET=True)
-	structure=parser.get_structure("LOL", filename)
-	dbn = TorusDBN(pdb_filename=filename, input_aa=True, input_angles=True)
-	phipsi_angles = dbn.get_angles()
-	
-	#os.system("cp " + filename + " tmp.pdb")
-	#os.system("sh /home/andersx/programs/fragbuilder/dssp_torsome.sh 2>/dev/null")
-	#dssp_file = os.popen("cat tmp.sec")
-	#dssp = dssp_file.readlines()[0]
-	#dssp_file.close()
-	
-	first_residue_id = 0
-	for model in structure[0]:
-		for residue in model:
-			if is_aa(residue):
-				first_residue_id = residue.get_id()[1]
-				break
-		break
-	
-	angles_dictionary = dict()
-	last_phi = 0
-	last_psi = 0
-	for model in structure[0]:
-		for residue in model:
-			if is_aa(residue):
-				angles_dictionary[residue.get_id()[1]] = dict()
+        resnum is the number of a residue
 
-				angles_dictionary[residue.get_id()[1]]['res_name'] = residue.get_resname()
-				angles_dictionary[residue.get_id()[1]]['res_letter'] = three_to_one(residue.get_resname())
-				#angles_dictionary[residue.get_id()[1]]['DSSP'] = dssp[residue.get_id()[1]-1-first_residue_id]
+        d[resnum]['resname']    : Returns the residue name
+        d[resnum]['res_letter'] : Returns the one letter residue code
+        d[resnum]['bb_angles']  : Returns a list containing [phi, psi]
+        d[resnum]['chi_angles'] : Returns a list containing chi angles
+    """
 
-				phi = phipsi_angles[residue.get_id()[1]-first_residue_id][0]*180/math.pi
-				psi = phipsi_angles[residue.get_id()[1]-first_residue_id][1]*180/math.pi
+    chain = get_first_chain(filename)
 
-                                angles_dictionary[residue.get_id()[1]]['bb_angles'] = [phi, psi]  
+    phipsi_angles = read_phi_psi(chain)
 
-				chi_angles = []
-				for chi_angle in get_chi(residue):
-					chi_angles.append(chi_angle/math.pi*180.0)
+    first_residue_id = 0
+    for residue in chain:
+        if Bio.PDB.is_aa(residue):
+            first_residue_id = residue.get_id()[1]
+            break
 
-				angles_dictionary[residue.get_id()[1]]['chi_angles'] = chi_angles
+    angles_dictionary = dict()
 
-	return angles_dictionary
+    for residue in chain:
+        if not Bio.PDB.is_aa(residue):
+            continue
+        angles_dictionary[residue.get_id()[1]] = dict()
+
+        angles_dictionary[residue.get_id()[1]]['res_name'] = residue.get_resname()
+        angles_dictionary[residue.get_id()[1]]['res_letter'] = three_to_one(residue.get_resname())
+
+        phi = phipsi_angles[residue.get_id()[1]-first_residue_id][0]
+        if phi is not None:
+            phi *= 180.0/math.pi
+        psi = phipsi_angles[residue.get_id()[1]-first_residue_id][1]
+        if psi is not None:
+            psi *= 180.0/math.pi
+
+        angles_dictionary[residue.get_id()[1]]['bb_angles'] = [phi, psi]  
+
+        chi_angles = []
+        for chi_angle in get_chi(residue):
+            chi_angles.append(chi_angle/math.pi*180.0)
+
+        angles_dictionary[residue.get_id()[1]]['chi_angles'] = chi_angles
+
+    return angles_dictionary
 
 
-	
