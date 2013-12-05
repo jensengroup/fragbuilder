@@ -4,17 +4,10 @@ fragbuilder
 fragbuilder is a tool to create, setup and analyze QM calculations on peptides.
 
 #### Requires:
-Openbabel 2.x.x
-A recent version of Biopython
-Python
-Probably requires some form of linux as well
+Openbabel 2.x.x (with Python bindings installed)
 
-#### Optional interfaces to:
-Gaussian 09
-BASILISK
-BackboneDBN
-
-
+Guide to install Open Babel:
+http://combichem.blogspot.dk/2013/12/compiling-open-babel-with-python.html
 
 How to use
 ==========
