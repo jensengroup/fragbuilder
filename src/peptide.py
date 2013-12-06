@@ -6,8 +6,16 @@ import basilisk_lib
 
 from residues import *
 from math_utils import *
-
 class peptide:
+    """ Usually instantiated from something like:
+
+        my_peptide = frabuilder.peptide("DAAAK", nterm="methyl", cterm="methyl")
+
+        NOTE: All functions use DEGREES as units if the have angles as input/output 
+        format. Radians are exclusively used internally in functions and are never
+        passed on.
+
+    """
 
     def __init__(self, init_sequence, nterm="methyl", cterm="methyl"):
         """ Create a fragbuilder peptide with a specific sequence.
@@ -94,11 +102,11 @@ class peptide:
             FragmentCharge = FragmentCharge + Residue.Charge
 
         for i in range(len(Fragment)-1):
-            print i, len(Fragment)-2
+
             if i == 0 and self._state_nterm != "methyl":
                 continue
-            if i == len(Fragment)-2 and self._state_cterm != "methyl":
-                continue
+            #if i == len(Fragment)-2 and self._state_cterm != "methyl":
+            #    continue
             #1.1 Get coordinate of connecting point.
             V3 = Fragment[i].AwesomeMol[Fragment[i].BB[len(Fragment[i].BB) - 1]-1][1]
             V2 = Fragment[i].AwesomeMol[Fragment[i].BB[len(Fragment[i].BB) - 2]-1][1]
@@ -482,15 +490,23 @@ class peptide:
         return
 
 
-    def get_residue_chi_angles(self, res_nr):
-        """ Sets the side chain torsion angles of a residue.
+    def get_residue_bb_angles(self, resnum):
+        """ Returns the [phi, psi, omega] of the side chain of the residue.
 
             Arguments:
-            res_nr -- The index for the residue.
-            angles_deg -- List of chi angles (in degrees).
+            res_nr -- The residue for which to calculate phi-, psi- and omega-angles.
         """
+        angles = self._get_all_bb_angles()[resnum - 1]
 
-        angles = np.array(angles_deg) * DEG_TO_RAD
+        return angles[1]
+
+
+    def get_residue_chi_angles(self, res_nr):
+        """ Returns the chi-angles of the side chain of the residue.
+
+            Arguments:
+            res_nr -- The residue for which to calculate chi-angles.
+        """
 
         offset = 0
 
@@ -499,14 +515,18 @@ class peptide:
             if i < res_nr:
                 offset += atoms_in_residue
 
-        for i, angle in enumerate(angles):
+        chis = []
+        for i, angle in enumerate(self._residues[res_nr].SC):
             chi_atom1 = self._molecule.OBMol.GetAtom(self._residues[res_nr].SC[i][0] + offset)
             chi_atom2 = self._molecule.OBMol.GetAtom(self._residues[res_nr].SC[i][1] + offset)
             chi_atom3 = self._molecule.OBMol.GetAtom(self._residues[res_nr].SC[i][2] + offset)
             chi_atom4 = self._molecule.OBMol.GetAtom(self._residues[res_nr].SC[i][3] + offset)
 
-            self._molecule.OBMol.GetTorsion(chi_atom1, chi_atom2, chi_atom3, chi_atom4, angle)
-        return
+            chi = self._molecule.OBMol.GetTorsion(chi_atom1, chi_atom2, chi_atom3, chi_atom4)
+
+            chis.append(chi)
+
+        return chis
 
 
 
@@ -533,23 +553,23 @@ class peptide:
         return self._charge
 
 
-    def get_residue_nr(self, atom_nr):
-        """ Returns the residue number which has the atom of index atom_nr.
+    # def get_residue_nr(self, atom_nr):
+    #     """ Returns the residue number which has the atom of index atom_nr.
 
-            Arguments:
-            atom_nr -- Index of the atom in question.
+    #         Arguments:
+    #         atom_nr -- Index of the atom in question.
 
-        """
+    #     """
 
-        correct_residue_nr = 0
-        nr_of_atoms_up_to_this_residues = 0
+    #     correct_residue_nr = 0
+    #     nr_of_atoms_up_to_this_residues = 0
 
-        for i, residue in enumerate(self._residues):
-            nr_of_atoms_up_to_this_residues += self._get_residue_length(residue)
-            if atom_nr <= nr_of_atoms_up_to_this_residues:
-                return i
-        print "ERROR: Atom nr", atom_nr, "not found.", nr_of_atoms_up_to_this_residues," in molecule."
-        exit(1)
+    #     for i, residue in enumerate(self._residues):
+    #         nr_of_atoms_up_to_this_residues += self._get_residue_length(residue)
+    #         if atom_nr <= nr_of_atoms_up_to_this_residues:
+    #             return i
+    #     print "ERROR: Atom nr", atom_nr, "not found.", nr_of_atoms_up_to_this_residues," in molecule."
+    #     exit(1)
 
     def _get_dihedral_constraints(self):
         """ Return a list of backbone and side chain torsion angles (for restraints).
@@ -648,12 +668,53 @@ class peptide:
         """
         return self._get_all_bb_angles()
 
-    def sample_chi_angles(self, resnum):
-        """ Resamples chi angles for a residue. 
+    def _basilisk_to_deg(self, a):
+        """ Return dihedral angle in the range [-180, 180] from
+            the output of BASILISK in the range [0, 2*pi].
+        """
+
+        if a > math.pi:
+            a = a - 2.0 * math.pi
+        return a * RAD_TO_DEG
+
+
+    def sample_residue_bb_angles(self, resnum):
+        """ Resamples phi and psi angles for a residue.
+            Returns the new [phi, psi] angles.
+
+            Arguments:
+            resnum -- number of the residue to resample
+
+            NB: This function sets the phi and psi angles to new values.
+
+        """
+
+        if self._dbn is None:
+            dbn = basilisk_lib.basilisk_dbn()
+
+        aa_letter = self._sequence[resnum - 1]
+        aa = int(basilisk_lib.basilisk_utils.one_to_index(aa_letter))
+        chis, bb, ll = dbn.get_sample(aa)
+
+        angles_deg = [self._basilisk_to_deg(bb[0]),
+                      self._basilisk_to_deg(bb[1])]
+
+        self.set_residue_bb_angles(resnum, angles_deg)
+
+        return angles_deg
+
+    def sample_residue_chi_angles(self, resnum, bb_dependency=True):
+        """ Resamples chi angles for a residue from BASILISK. 
             Returns the new chi angles.
 
             Arguments:
             resnum -- number of the residue to resample
+
+            Keyword arguments:
+            bb_dependency -- Whether to sample chi angles taking 
+            phi/psi angles into account in BASILISK sampling. (default True)
+
+            NB: This function sets the chi angles to new values.
 
         """
 
@@ -668,11 +729,23 @@ class peptide:
         aa_letter = self._sequence[resnum - 1]
 
         aa = int(basilisk_lib.basilisk_utils.one_to_index(aa_letter))
-        chis, bb, ll = dbn.get_sample(aa, phi, psi)
 
-        return chis
+        if bb_dependency:
+            chis, bb, ll = dbn.get_sample(aa, phi, psi)
+        else:
+            chis, bb, ll = dbn.get_sample(aa)
 
-    def energy(self):
+        chis_deg = []
+        for chi in chis:
+            chis_deg.append(self._basilisk_to_deg(chi))
+
+        self.set_residue_chi_angles(resnum, chis_deg)
+
+        return chis_deg
+
+
+
+    def get_energy(self):
         """ Returns the MMFF94 energy of the peptide in kcal/mol.
 
         """
