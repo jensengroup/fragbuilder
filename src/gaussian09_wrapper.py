@@ -130,3 +130,98 @@ class load_opt_file:
 		write_g09_nmr_file(filename)
 		run_g09(filename)
 
+
+###  _nprocs = 1
+###  _mem_in_mb = "400mb"
+###  _method_and_basis = "pm6"
+###  _comment = "No Title"
+###  _solvation = ""
+
+###  def set_solvent(self, solvent_type):
+###      if solvent_type == "":
+###          self._solvation = ""
+###      else:
+###          self._solvation = "scrf=(solvent=" + solvent_type + ")"
+
+###  def set_method_and_basis_set(self, command):
+###      self._method_and_basis = command
+
+
+###  def set_memory(self, amount):
+###      self._mem_in_mb = amount
+
+
+###  def set_nprocs(self, nprocs):
+###      self._nprocs = str(nprocs)
+
+
+###  def set_comment(self, comment):
+###      self._comment = comment
+
+
+###  def write_g09_opt_file(self, filename, constraint_dihedral=True):
+###
+###      output_stream  = "%mem = "
+###      output_stream += self._mem_in_mb + "\n"
+###      output_stream += "%nprocs= " + str(self._nprocs)
+###      output_stream += "\n#t opt=modredundant "
+###      output_stream += self._method_and_basis
+###      output_stream += " " + self._solvation
+###      output_stream += "\n\n" + self._comment+ "\n\n "
+###      output_stream += str(self.get_charge()) + " 1\n"
+
+###      for atom in self._molecule:
+###          output_stream += atom.type[0] + " " + str(atom.coords[0]) + " " + str(atom.coords[1]) + " " + str(atom.coords[2]) + "\n"
+
+###      if constraint_dihedral:
+###          output_stream += self._get_freeze_string()
+###      output_stream += "\n\n"
+
+###      g09_file = open(filename, "w")
+###      g09_file.write(output_stream)
+###      g09_file.close()
+
+
+
+
+
+
+###    # A list of dihedral angles to be frozen in G09 optimization.
+###    def _get_freeze_string(self):
+###
+###        backbone_chain = []
+###
+###        offset = 0
+###
+###        for i, residue in enumerate(self._residues):
+###            atoms_in_residue = self._get_residue_length(residue)
+###            for atom in residue.BB:
+###                backbone_chain.append(atom + offset)
+###            offset += atoms_in_residue
+###
+###
+###        backbone_chain.sort()
+###
+###        freeze_string = "\n"
+###
+###        for i in range(len(backbone_chain)-3):
+###            freeze_string += "D "
+###            for j in range(4):
+###                freeze_string += str(backbone_chain[i+j]) + " "
+###            freeze_string +="F\n"
+###
+###        offset = 0
+###
+###        for i, residue in enumerate(self._residues):
+###            atoms_in_residue = self._get_residue_length(residue)
+###            for dihedral in residue.SC:
+###                freeze_string += "D "
+###                for atom_index in dihedral:
+###                    freeze_string += str(atom_index + offset) + " "
+###                freeze_string +="F\n"
+###            offset += atoms_in_residue
+###
+###        return freeze_string
+
+
+

@@ -16,7 +16,6 @@ def ReadCoordzAwesome(Filename):
                         Coords = numpy.array([X,Y,Z])
                         Element = [Type, Coords]
                         ThisAwesomeMol.append(Element)
-#       print ThisAwesomeMol
         return ThisAwesomeMol
 
 

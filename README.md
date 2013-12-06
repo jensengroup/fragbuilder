@@ -6,7 +6,7 @@ fragbuilder is a tool to create, setup and analyze QM calculations on peptides.
 #### Requires:
 Python 2.x
 Openbabel 2.x.x (with Python bindings installed)
-Numpy
+Numpy (pretty much any version should be fine)
 
 
 Note: fragbuilder will run with most versions of Open Babel, however there was bug in Open Babel which prevented some dihedral angles to be set accurately. If you experience this while using fragbuilder you will have to update your Open Babel.
@@ -32,17 +32,18 @@ export PYTHONPATH=/home/andersx/programs/fragbuilder:$PYTHONPATH
 import fragbuilder
 
 
-5) Look in examples/*.py for inspiration
+5) Look in examples/\*.py for inspiration
 
-6) There is not much documentation at this point. Type help(openbabel) in a Python shell to access the man pages.
+6) Type help(fragbuilder) in a Python shell to access the documentation.
 
+help(fragbuilder.peptide) will give you the user documentation for most of fragbuilder's functionality.
 
 How to cite use of fragbuilder:
 ===============================
-Do something like this:
+For now do something like this:
 "fragbuilder" (2013) Anders S. Christensen, Jan H. Jensen, https://github.com/andersx/fragbuilder 
 There will be a proper paper on arXiv shortly.
 
 Licensing
 =========
-fragbuilder is licensed under the two-clause BSD license which mean you can pretty much do whatever you want as long as you cite properly and/or mentions the name of the authors.
+fragbuilder is licensed under the two-clause BSD license which mean you can pretty much do whatever you want as long as you cite properly and/or mentions the name of the authors. fragbuilder also packages the BASILISK library under the terms of the Gnu GPL.

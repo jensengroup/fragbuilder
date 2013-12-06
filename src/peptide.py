@@ -9,102 +9,13 @@ from math_utils import *
 
 class peptide:
 
-    def _init_residues(self, sequence):
-
-        residues = [LeftMethylCap()]
-
-        for i in sequence:
-            residues.append(aa_dictionary[i]())
-
-        residues.append(RightMethylCap())
-
-        return residues
-
-    def _get_residue_length(self, residue):
-        i = 0
-        for atom in residue.Mol:
-            i += 1
-        return i
-
-    def _rotate_xyz(self, mol, axis, center, angle):
-        for atom in mol:
-
-                #Translate Atom, so Center corresponds to (0,0,0).
-                atom[1] = atom[1] - center
-                #Rotate!
-                atom[1] = rotate(atom[1], axis - center, angle)
-                atom[1] = atom[1] + center
-
-        return mol
-
-
-    def _get_all_bb_angles(self):
-
-        angles = []
-        for res_nr, residue in enumerate(self._residues):
-
-            if res_nr == 0 or res_nr == len(self._residues) - 1:
-                continue
-
-            offset_prev = 0
-            offset_this = 0
-            offset_next = 0
-            for j, residue2 in enumerate(self._residues):
-                atoms_in_residue = self._get_residue_length(residue2)
-                if j < res_nr - 1:
-                    offset_prev += atoms_in_residue
-                if j < res_nr:
-                    offset_this += atoms_in_residue
-                if j < res_nr + 1:
-                    offset_next += atoms_in_residue
-
-            omega = False
-            phi = False
-            psi = False
-
-            # Special case for first residue with 
-            if res_nr == 1 and self._state_nterm != "methyl":
-                NH1 = self._molecule.OBMol.GetAtom(self._residues[res_nr].BB[0] + offset_this)
-                CA1 = self._molecule.OBMol.GetAtom(self._residues[res_nr].BB[1] + offset_this)
-                CO1 = self._molecule.OBMol.GetAtom(self._residues[res_nr].BB[2] + offset_this)
-                NH2 = self._molecule.OBMol.GetAtom(self._residues[res_nr + 1].BB[0] + offset_next)
-
-                omega = False
-                phi = False
-                psi = self._molecule.OBMol.GetTorsion(NH1, CA1, CO1, NH2) #PSI
-
-            # For standard residues
-            else:
-                CA0 = self._molecule.OBMol.GetAtom(self._residues[res_nr - 1].BB[-2] + offset_prev)
-                CO0 = self._molecule.OBMol.GetAtom(self._residues[res_nr - 1].BB[-1] + offset_prev)
-                NH1 = self._molecule.OBMol.GetAtom(self._residues[res_nr].BB[0] + offset_this)
-                CA1 = self._molecule.OBMol.GetAtom(self._residues[res_nr].BB[1] + offset_this)
-                CO1 = self._molecule.OBMol.GetAtom(self._residues[res_nr].BB[2] + offset_this)
-                NH2 = self._molecule.OBMol.GetAtom(self._residues[res_nr + 1].BB[0] + offset_next)
-
-                omega = self._molecule.OBMol.GetTorsion(CA0, CO0, NH1, CA1) #Omega
-                phi = self._molecule.OBMol.GetTorsion(CO0, NH1, CA1, CO1) #PHI
-                psi = self._molecule.OBMol.GetTorsion(NH1, CA1, CO1, NH2) #PSI
-
-            angles.append([res_nr, [phi, psi, omega]])
-
-        return angles
-
-    def print_angles(self):
-        print self._get_all_bb_angles()
-
-    def _get_all_sc_angles(self):
-        return 0
-
-
-
     def __init__(self, init_sequence, nterm="methyl", cterm="methyl"):
-        """ Create a fragbuilder peptide with a specific sequence
+        """ Create a fragbuilder peptide with a specific sequence.
+            E.g. "GGG" for a triple glycine peptide.
             Default backbone angles are (phi, psi, omega) = (-120, 140, 180).
 
             Arguments:
-            init_sequence -- sequence in one letter format. E.g. ""GGG""
-            for a triple glycine peptide.
+            init_sequence -- sequence in one letter format. 
 
             Keyword arguments:
             nterm -- Type of cap at the n-terminal. (Default "methyl")
@@ -114,240 +25,68 @@ class peptide:
 
         """
 
-
         self._sequence = init_sequence.upper()
 
         self._state_nterm = nterm
         self._state_cterm = cterm
 
-        self._molecule = self._assemble_peptide(self._sequence)
+        self._residues = self._init_residues(init_sequence)
+        self._molecule = self._assemble_peptide(self._residues)
         self._charge   = self._calc_charge()
         self._length   = len(init_sequence)
-        self._residues = self._init_residues(init_sequence)
 
         self._dbn = None
 
 
-
-
-    def _reassemble_peptide(self, sequence):
-
-        all_bb_angles = self._get_all_bb_angles()
-        self._molecule = self._assemble_peptide(self._sequence)
-
-
-    def get_smiles(self):
-        return self._molecule
-
-    def write_xyz(self, filename):
-        self._molecule.write("xyz", filename, overwrite=True)
-
-
-    def get_length(self):
-        return self._length
-
-    def set_residue_bb_angles(self, res_nr, angles):
-
-
-        if len(angles) == 3:
-            phi   = angles[0] * DEG_TO_RAD
-            psi   = angles[1] * DEG_TO_RAD
-            omega = angles[2] * DEG_TO_RAD
-        elif len(angles) == 2:
-            phi   = angles[0]  * DEG_TO_RAD
-            psi   = angles[1]  * DEG_TO_RAD
-            omega = math.pi
-        else: 
-            print "ERROR: Angles must be of type: [phi, psi, omega] or [phi, psi]"
-            sys.exit(1)
-
-        if res_nr < 1 or res_nr > len(self._residues) - 2:
-                        print "ERROR: Error in set_residue_bb_angles. User supplied index:", res_nr, "Allowed range: 1 -", len(self._residues) - 2
-                        sys.exit(1)
-
-        offset_prev = 0
-        offset_this = 0
-        offset_next = 0
-#       print self._residues
-
-        for i, residue in enumerate(self._residues):
-            atoms_in_residue = self._get_residue_length(residue)
-            #print i, atoms_in_residue, self._residues[i]
-            if i < res_nr - 1:
-                offset_prev += atoms_in_residue
-            if i < res_nr:
-                offset_this += atoms_in_residue
-            if i < res_nr + 1:
-                offset_next += atoms_in_residue
-#       print offset_prev, offset_this, offset_next
-#       print "lol", self._residues[res_nr].Filename
-        if res_nr == 1 and self._state_nterm != "methyl":
-            NH1 = self._molecule.OBMol.GetAtom(self._residues[res_nr].BB[0] + offset_this)
-            CA1 = self._molecule.OBMol.GetAtom(self._residues[res_nr].BB[1] + offset_this)
-            CO1 = self._molecule.OBMol.GetAtom(self._residues[res_nr].BB[2] + offset_this)
-            NH2 = self._molecule.OBMol.GetAtom(self._residues[res_nr + 1].BB[0] + offset_next)
-
-            self._molecule.OBMol.SetTorsion(NH1, CA1, CO1, NH2, psi) #PSI
-        else:
-            CA0 = self._molecule.OBMol.GetAtom(self._residues[res_nr - 1].BB[-2] + offset_prev)
-            CO0 = self._molecule.OBMol.GetAtom(self._residues[res_nr - 1].BB[-1] + offset_prev)
-            NH1 = self._molecule.OBMol.GetAtom(self._residues[res_nr].BB[0] + offset_this)
-            CA1 = self._molecule.OBMol.GetAtom(self._residues[res_nr].BB[1] + offset_this)
-            CO1 = self._molecule.OBMol.GetAtom(self._residues[res_nr].BB[2] + offset_this)
-            NH2 = self._molecule.OBMol.GetAtom(self._residues[res_nr + 1].BB[0] + offset_next)
-
-            self._molecule.OBMol.SetTorsion(CA0, CO0, NH1, CA1, omega) #Omega
-            self._molecule.OBMol.SetTorsion(CO0, NH1, CA1, CO1, phi) #PHI
-            # If c-term cap is not methyl, there is no NH2 atom
-            if NH2 != None:
-                self._molecule.OBMol.SetTorsion(NH1, CA1, CO1, NH2, psi) #PSI
-
-
-    def set_residue_chi_angles(self, res_nr, angles_deg):
-        """ Sets the side chain torsion angles of a residue.
+    def _init_residues(self, sequence):
+        """ Returns an ordered list of Residues given the amino acid sequence.
 
             Arguments:
-            res_nr -- The index for the residue.
-            angles_deg -- List of chi angles (in degrees).
+            sequence -- A text string with the amino acid sequence in one letter format.
+
         """
-
-        angles = np.array(angles_deg) * DEG_TO_RAD
-
-        offset = 0
-
-        for i, residue in enumerate(self._residues):
-            atoms_in_residue = self._get_residue_length(residue)
-            if i < res_nr:
-                offset += atoms_in_residue
-
-        for i, angle in enumerate(angles):
-            chi_atom1 = self._molecule.OBMol.GetAtom(self._residues[res_nr].SC[i][0] + offset)
-            chi_atom2 = self._molecule.OBMol.GetAtom(self._residues[res_nr].SC[i][1] + offset)
-            chi_atom3 = self._molecule.OBMol.GetAtom(self._residues[res_nr].SC[i][2] + offset)
-            chi_atom4 = self._molecule.OBMol.GetAtom(self._residues[res_nr].SC[i][3] + offset)
-
-            self._molecule.OBMol.SetTorsion(chi_atom1, chi_atom2, chi_atom3, chi_atom4, angle)
-        return
-
-    _nprocs = 1
-    _mem_in_mb = "400mb"
-    _method_and_basis = "pm6"
-    _comment = "No Title"
-    _solvation = ""
-
-    def set_solvent(self, solvent_type):
-        if solvent_type == "":
-            self._solvation = ""
+        residues = []
+        if self._state_nterm == "methyl":
+            residues.append(LeftMethylCap())
+        elif self._state_nterm == "charged":
+            residues.append(LeftChargedCap())
+        elif self._state_nterm == "neutral":
+            residues.append(LeftNeutralCap())
         else:
-            self._solvation = "scrf=(solvent=" + solvent_type + ")"
-
-    def set_method_and_basis_set(self, command):
-        self._method_and_basis = command
-
-
-    def set_memory(self, amount):
-        self._mem_in_mb = amount
-
-
-    def set_nprocs(self, nprocs):
-        self._nprocs = str(nprocs)
-
-
-    def set_comment(self, comment):
-        self._comment = comment
-
-
-    def write_g09_opt_file(self, filename, constraint_dihedral=True):
-        
-        output_stream  = "%mem = "
-        output_stream += self._mem_in_mb + "\n"
-        output_stream += "%nprocs= " + str(self._nprocs)
-        output_stream += "\n#t opt=modredundant " 
-        output_stream += self._method_and_basis
-        output_stream += " " + self._solvation
-        output_stream += "\n\n" + self._comment+ "\n\n " 
-        output_stream += str(self.get_charge()) + " 1\n" 
-
-        for atom in self._molecule: 
-            output_stream += atom.type[0] + " " + str(atom.coords[0]) + " " + str(atom.coords[1]) + " " + str(atom.coords[2]) + "\n"
-
-        if constraint_dihedral:
-            output_stream += self._get_freeze_string()
-        output_stream += "\n\n"
-
-        g09_file = open(filename, "w")
-        g09_file.write(output_stream)
-        g09_file.close()
-
-
-    def get_sequence(self):
-        return self._sequence
-
-
-    def _calc_charge(self):
-
-        charge = 0
-        for i in self._sequence:
-            charge += aa_dictionary[i].Charge
-        return charge
-
-
-
-
-    def get_charge(self):
-        return self._charge
-
-
-    # A list of dihedral angles to be frozen in G09 optimization.
-    def _get_freeze_string(self):
-
-        backbone_chain = []
-
-        offset = 0
-
-        for i, residue in enumerate(self._residues):
-            atoms_in_residue = self._get_residue_length(residue)
-            for atom in residue.BB:
-                backbone_chain.append(atom + offset)
-            offset += atoms_in_residue
-
-
-        backbone_chain.sort()
-
-        freeze_string = "\n"
-
-        for i in range(len(backbone_chain)-3):
-            freeze_string += "D " 
-            for j in range(4):
-                freeze_string += str(backbone_chain[i+j]) + " "
-            freeze_string +="F\n"
-
-        offset = 0
-
-        for i, residue in enumerate(self._residues):
-            atoms_in_residue = self._get_residue_length(residue)
-            for dihedral in residue.SC:
-                freeze_string += "D "
-                for atom_index in dihedral:
-                    freeze_string += str(atom_index + offset) + " "
-                freeze_string +="F\n"
-            offset += atoms_in_residue
-
-        return freeze_string
-
-    # Returns the peptide as an OBMol with phi/psi angles -120/140 degrees
-    # which corresponds to nicely to a straight B-sheet strand.
-    def _assemble_peptide(self, sequence):
-
-        residues = [LeftMethylCap()]
+            print "ERROR: Unknown nterm =", self._state_nterm
+            exit(1)
 
         for i in sequence:
             residues.append(aa_dictionary[i]())
 
-        residues.append(RightMethylCap())
+        if self._state_cterm == "methyl":
+            residues.append(RightMethylCap())
+        elif self._state_cterm == "charged":
+            residues.append(RightChargedCap())
+        elif self._state_cterm == "neutral":
+            residues.append(RightNeutralCap())
+        else:
+            print "ERROR: Unknown cterm =", self._state_cterm
+            exit(1)
 
-        Fragment = residues
 
+        return residues
+
+
+    def _assemble_peptide(self, Fragment):
+        """ Returns an OBMol, constructed from a list of residues.
+            Uses the legacy code from AwesomeMol class I did in my
+            undergrad years. 
+
+            Arguments:
+            Fragment -- An ordered list of Residues.
+
+            TODO: Change this to Open Babel only.
+            TODO: Remove use of pybel (use OB instead).
+            TODO: Remove use of temporary file.
+            TODO: Adhere to standard Python notation.
+
+        """
         TotalAtoms = 0
         FragmentCharge = 0
         for Residue in Fragment:
@@ -355,6 +94,11 @@ class peptide:
             FragmentCharge = FragmentCharge + Residue.Charge
 
         for i in range(len(Fragment)-1):
+            print i, len(Fragment)-2
+            if i == 0 and self._state_nterm != "methyl":
+                continue
+            if i == len(Fragment)-2 and self._state_cterm != "methyl":
+                continue
             #1.1 Get coordinate of connecting point.
             V3 = Fragment[i].AwesomeMol[Fragment[i].BB[len(Fragment[i].BB) - 1]-1][1]
             V2 = Fragment[i].AwesomeMol[Fragment[i].BB[len(Fragment[i].BB) - 2]-1][1]
@@ -398,12 +142,9 @@ class peptide:
             #2.4 Rotate all coordinates in the AwesomeMol
             Fragment[i+1].AwesomeMol = self._rotate_xyz(Fragment[i+1].AwesomeMol, Axis2, Center2, Angle2)
 
-        # So far the peptide has been assembled with methyl-caps. Now I replace with charged/neutral caps
-        # if the n-term and c-term states are not set to "methyl"
-
         # A little houskeeping here. Adjust total number of atoms and 
         if self._state_nterm == "methyl":
-            temp = 0 # do nothing
+            "do nothing"
         elif self._state_nterm == "neutral":
             TotalAtoms = TotalAtoms - len(Fragment[0].Mol.atoms) + 1
             Fragment[0] = LeftNeutralCap()
@@ -427,7 +168,7 @@ class peptide:
 
 
         if self._state_cterm == "methyl":
-            temp = 0 # do nothing
+            "do nothing"
 
         elif self._state_cterm == "neutral":
             TotalAtoms = TotalAtoms - len(Fragment[-1].Mol.atoms) + 2
@@ -452,7 +193,6 @@ class peptide:
 
             Fragment[-1].AwesomeMol[0][1] = CO - (NH - CA) * 0.8
 
-    
         uid = uuid.uuid4()
         temp_xyz = uid.hex  + ".xyz"
         file_out = open(temp_xyz, "w")
@@ -467,40 +207,330 @@ class peptide:
         file_out.close()
 
         mol = pybel.readfile("xyz", temp_xyz).next()
-        for k in range(3):
-            for i in range(len(Fragment)-2):
+        for i in range(len(Fragment)-2):
 
-                ThisResidue = i + 1
-                NextOffset = 0
-                for j in range(ThisResidue+1):
-                    NextOffset = NextOffset + len(Fragment[j].Mol.atoms)
-                Offset = 0
-                for j in range(ThisResidue):
-                    Offset = Offset + len(Fragment[j].Mol.atoms)
-                PrevOffset = 0
-                for j in range(ThisResidue-1):
-                    PrevOffset = PrevOffset + len(Fragment[j].Mol.atoms)
-                #try:
+            ThisResidue = i + 1
+            NextOffset = 0
+            for j in range(ThisResidue+1):
+                NextOffset = NextOffset + len(Fragment[j].Mol.atoms)
+            Offset = 0
+            for j in range(ThisResidue):
+                Offset = Offset + len(Fragment[j].Mol.atoms)
+            PrevOffset = 0
+            for j in range(ThisResidue-1):
+                PrevOffset = PrevOffset + len(Fragment[j].Mol.atoms)
+
+            if i == 1 and self._state_nterm == "methyl":
+            #try:
                 CA0 = mol.OBMol.GetAtom(Fragment[ThisResidue - 1].BB[-2] + PrevOffset)
                 CO0 = mol.OBMol.GetAtom(Fragment[ThisResidue - 1].BB[-1] + PrevOffset)
                 NH1 = mol.OBMol.GetAtom(Fragment[ThisResidue].BB[0] + Offset)
                 CA1 = mol.OBMol.GetAtom(Fragment[ThisResidue].BB[1] + Offset)
-                CO1 = mol.OBMol.GetAtom(Fragment[ThisResidue].BB[2] + Offset)
-                NH2 = mol.OBMol.GetAtom(Fragment[ThisResidue + 1].BB[0] + NextOffset )
-
                 mol.OBMol.SetTorsion(CA0, CO0, NH1, CA1, math.pi) #Omega
-                mol.OBMol.SetTorsion(CO0, NH1, CA1, CO1, -120.0/180.0*math.pi)
-                mol.OBMol.SetTorsion(NH1, CA1, CO1, NH2, 140.0/180.0*math.pi)
-                #print mol.OBMol.GetTorsion(CA0, CO0, NH1, CA1)
-                #print mol.OBMol.GetTorsion(CO0, NH1, CA1, CO1)
-                #print mol.OBMol.GetTorsion(NH1, CA1, CO1, NH2)
-                #except:
-                #    temp = 0
+            # except:
+            #     print "Couldn't set omega angle"
+
+            # try:
+                CO0 = mol.OBMol.GetAtom(Fragment[ThisResidue - 1].BB[-1] + PrevOffset)
+                NH1 = mol.OBMol.GetAtom(Fragment[ThisResidue].BB[0] + Offset)
+                CA1 = mol.OBMol.GetAtom(Fragment[ThisResidue].BB[1] + Offset)
+                CO1 = mol.OBMol.GetAtom(Fragment[ThisResidue].BB[2] + Offset)
+                mol.OBMol.SetTorsion(CO0, NH1, CA1, CO1, -120.0 * DEG_TO_RAD)
+            # except:
+            #     print "Couldn't set phi angle"
+
+            # try:
+            NH1 = mol.OBMol.GetAtom(Fragment[ThisResidue].BB[0] + Offset)
+            CA1 = mol.OBMol.GetAtom(Fragment[ThisResidue].BB[1] + Offset)
+            CO1 = mol.OBMol.GetAtom(Fragment[ThisResidue].BB[2] + Offset)
+            NH2 = mol.OBMol.GetAtom(Fragment[ThisResidue + 1].BB[0] + NextOffset )
+            mol.OBMol.SetTorsion(NH1, CA1, CO1, NH2, 140.0/180.0*math.pi)
+            # except:
+            #     print "Couldn't set psi angle"
 
         os.remove(temp_xyz)
 
         return mol
 
+
+
+    def _get_residue_length(self, residue):
+        """ Returns the number of atoms in a residue object.
+
+            Arguments:
+            residue -- A Residue object
+        """
+        i = 0
+        for atom in residue.Mol:
+            i += 1
+        return i
+
+    def _rotate_xyz(self, mol, axis, center, angle):
+        """ Rotates the coordinate in a Residue object and returns new coordinates
+            
+            Arguments:
+            mol -- The Mol property of the Residue
+            axis -- The rotation vector
+            center -- The rotation center (defines the axis)
+            angle -- The angle to be rotated
+
+        """
+        for atom in mol:
+
+                #Translate Atom, so Center corresponds to (0,0,0).
+                atom[1] = atom[1] - center
+                #Rotate!
+                atom[1] = rotate(atom[1], axis - center, angle)
+                atom[1] = atom[1] + center
+
+        return mol
+
+
+    def _get_all_bb_angles(self):
+        """ Returns a list of the dihedral angles in the peptide.
+
+            Format is:
+            [[1, [phi1, psi1, omega1]],
+             [2, [phi2, psi2, omega2]],
+             [3, [phi3, psi3, omega3]],
+             [4, [phi4, psi4, omega4]],
+                ....
+             [n, [phin, psin, omegan]]
+        """
+        angles = []
+        for res_nr, residue in enumerate(self._residues):
+
+            if res_nr == 0 or res_nr == len(self._residues) - 1:
+                continue
+
+            offset_prev = 0
+            offset_this = 0
+            offset_next = 0
+            for j, residue2 in enumerate(self._residues):
+                atoms_in_residue = self._get_residue_length(residue2)
+                if j < res_nr - 1:
+                    offset_prev += atoms_in_residue
+                if j < res_nr:
+                    offset_this += atoms_in_residue
+                if j < res_nr + 1:
+                    offset_next += atoms_in_residue
+
+            omega = False
+            phi = False
+            psi = False
+
+            # Special case for first residue with 
+            if res_nr == 1 and self._state_nterm != "methyl":
+                NH1 = self._molecule.OBMol.GetAtom(self._residues[res_nr].BB[0] + offset_this)
+                CA1 = self._molecule.OBMol.GetAtom(self._residues[res_nr].BB[1] + offset_this)
+                CO1 = self._molecule.OBMol.GetAtom(self._residues[res_nr].BB[2] + offset_this)
+                NH2 = self._molecule.OBMol.GetAtom(self._residues[res_nr + 1].BB[0] + offset_next)
+
+                omega = False
+                phi = False
+                psi = self._molecule.OBMol.GetTorsion(NH1, CA1, CO1, NH2) #PSI
+
+            elif res_nr == len(self._sequence) and self._state_cterm != "methyl":
+                CA0 = self._molecule.OBMol.GetAtom(self._residues[res_nr - 1].BB[-2] + offset_prev)
+                CO0 = self._molecule.OBMol.GetAtom(self._residues[res_nr - 1].BB[-1] + offset_prev)
+                NH1 = self._molecule.OBMol.GetAtom(self._residues[res_nr].BB[0] + offset_this)
+                CA1 = self._molecule.OBMol.GetAtom(self._residues[res_nr].BB[1] + offset_this)
+                CO1 = self._molecule.OBMol.GetAtom(self._residues[res_nr].BB[2] + offset_this)
+                NH2 = self._molecule.OBMol.GetAtom(self._residues[res_nr + 1].BB[0] + offset_next)
+
+                omega = self._molecule.OBMol.GetTorsion(CA0, CO0, NH1, CA1) #Omega
+                phi = self._molecule.OBMol.GetTorsion(CO0, NH1, CA1, CO1) #PHI
+                psi = self._molecule.OBMol.GetTorsion(NH1, CA1, CO1, NH2) #PSI
+
+            # For standard residues
+            else:
+                CA0 = self._molecule.OBMol.GetAtom(self._residues[res_nr - 1].BB[-2] + offset_prev)
+                CO0 = self._molecule.OBMol.GetAtom(self._residues[res_nr - 1].BB[-1] + offset_prev)
+                NH1 = self._molecule.OBMol.GetAtom(self._residues[res_nr].BB[0] + offset_this)
+                CA1 = self._molecule.OBMol.GetAtom(self._residues[res_nr].BB[1] + offset_this)
+                CO1 = self._molecule.OBMol.GetAtom(self._residues[res_nr].BB[2] + offset_this)
+                NH2 = self._molecule.OBMol.GetAtom(self._residues[res_nr + 1].BB[0] + offset_next)
+
+                omega = self._molecule.OBMol.GetTorsion(CA0, CO0, NH1, CA1) #Omega
+                phi = self._molecule.OBMol.GetTorsion(CO0, NH1, CA1, CO1) #PHI
+                psi = self._molecule.OBMol.GetTorsion(NH1, CA1, CO1, NH2) #PSI
+
+            angles.append([res_nr, [phi, psi, omega]])
+
+        return angles
+
+
+    def get_smiles(self):
+        """ Returns the SMILES string corresponding to the peptide.
+        """
+        return string.split(str(self._molecule))[0]
+
+    def write_xyz(self, filename):
+        """ Writes the peptide molecule to a file in .xyz format.
+
+        Arguments:
+        filename -- The output filename
+
+        WARNING: Will overwrite an existing file with the same name!
+
+        """
+        self._molecule.write("xyz", filename, overwrite=True)
+
+
+    def get_length(self):
+        """ Returns the number of residues in the peptide.
+
+        """
+        return self._length
+
+    def set_residue_bb_angles(self, res_nr, angles_deg):
+        """ Set the phi, phsi and omega angles of a residue (in degrees).
+
+            Arguments:
+            res_nr -- The residue number.
+            angles -- A list in the format: [phi, psi, omega]
+
+            NOTE: angles can be given as [phi, psi] in which case omega is
+            assumed = 180 degrees.
+        """
+
+        angles = numpy.array(angles_deg) * DEG_TO_RAD
+
+        if len(angles) == 3:
+            phi   = angles[0]
+            psi   = angles[1]
+            omega = angles[2]
+        elif len(angles) == 2:
+            phi   = angles[0]
+            psi   = angles[1]
+            omega = math.pi
+        else: 
+            print "ERROR: Angles must be of type: [phi, psi, omega] or [phi, psi]"
+            sys.exit(1)
+
+        if res_nr < 1 or res_nr > len(self._residues) - 2:
+                        print "ERROR: Error in set_residue_bb_angles. User supplied index:", res_nr, "Allowed range: 1 -", len(self._residues) - 2
+                        sys.exit(1)
+
+        offset_prev = 0
+        offset_this = 0
+        offset_next = 0
+
+
+        for i, residue in enumerate(self._residues):
+            atoms_in_residue = self._get_residue_length(residue)
+            if i < res_nr - 1:
+                offset_prev += atoms_in_residue
+            if i < res_nr:
+                offset_this += atoms_in_residue
+            if i < res_nr + 1:
+                offset_next += atoms_in_residue
+        if res_nr == 1 and self._state_nterm != "methyl":
+            NH1 = self._molecule.OBMol.GetAtom(self._residues[res_nr].BB[0] + offset_this)
+            CA1 = self._molecule.OBMol.GetAtom(self._residues[res_nr].BB[1] + offset_this)
+            CO1 = self._molecule.OBMol.GetAtom(self._residues[res_nr].BB[2] + offset_this)
+            NH2 = self._molecule.OBMol.GetAtom(self._residues[res_nr + 1].BB[0] + offset_next)
+
+            self._molecule.OBMol.SetTorsion(NH1, CA1, CO1, NH2, psi) #PSI
+
+        else:
+            CA0 = self._molecule.OBMol.GetAtom(self._residues[res_nr - 1].BB[-2] + offset_prev)
+            CO0 = self._molecule.OBMol.GetAtom(self._residues[res_nr - 1].BB[-1] + offset_prev)
+            NH1 = self._molecule.OBMol.GetAtom(self._residues[res_nr].BB[0] + offset_this)
+            CA1 = self._molecule.OBMol.GetAtom(self._residues[res_nr].BB[1] + offset_this)
+            CO1 = self._molecule.OBMol.GetAtom(self._residues[res_nr].BB[2] + offset_this)
+            NH2 = self._molecule.OBMol.GetAtom(self._residues[res_nr + 1].BB[0] + offset_next)
+
+            self._molecule.OBMol.SetTorsion(CA0, CO0, NH1, CA1, omega) #Omega
+            self._molecule.OBMol.SetTorsion(CO0, NH1, CA1, CO1, phi) #PHI
+            # If c-term cap is not methyl, there is no NH2 atom
+            if NH2 != None:
+                self._molecule.OBMol.SetTorsion(NH1, CA1, CO1, NH2, psi) #PSI
+        return
+
+
+    def set_residue_chi_angles(self, res_nr, angles_deg):
+        """ Sets the side chain torsion angles of a residue.
+
+            Arguments:
+            res_nr -- The index for the residue.
+            angles_deg -- List of chi angles (in degrees).
+        """
+
+        if len(angles_deg) != len(self._residues[res_nr].SC):
+            print "ERROR: Could not set residue %i chi-angles to" % (res_nr), angles_deg
+            print "ERROR: Residue %i has %i chi angles, %i given" % (res_nr, len(self._residues[res_nr].SC), len(angles_deg))
+
+            exit(1)
+
+        angles = np.array(angles_deg) * DEG_TO_RAD
+
+        offset = 0
+
+        for i, residue in enumerate(self._residues):
+            atoms_in_residue = self._get_residue_length(residue)
+            if i < res_nr:
+                offset += atoms_in_residue
+
+        for i, angle in enumerate(angles):
+            chi_atom1 = self._molecule.OBMol.GetAtom(self._residues[res_nr].SC[i][0] + offset)
+            chi_atom2 = self._molecule.OBMol.GetAtom(self._residues[res_nr].SC[i][1] + offset)
+            chi_atom3 = self._molecule.OBMol.GetAtom(self._residues[res_nr].SC[i][2] + offset)
+            chi_atom4 = self._molecule.OBMol.GetAtom(self._residues[res_nr].SC[i][3] + offset)
+
+            self._molecule.OBMol.SetTorsion(chi_atom1, chi_atom2, chi_atom3, chi_atom4, angle)
+        return
+
+
+    def get_residue_chi_angles(self, res_nr):
+        """ Sets the side chain torsion angles of a residue.
+
+            Arguments:
+            res_nr -- The index for the residue.
+            angles_deg -- List of chi angles (in degrees).
+        """
+
+        angles = np.array(angles_deg) * DEG_TO_RAD
+
+        offset = 0
+
+        for i, residue in enumerate(self._residues):
+            atoms_in_residue = self._get_residue_length(residue)
+            if i < res_nr:
+                offset += atoms_in_residue
+
+        for i, angle in enumerate(angles):
+            chi_atom1 = self._molecule.OBMol.GetAtom(self._residues[res_nr].SC[i][0] + offset)
+            chi_atom2 = self._molecule.OBMol.GetAtom(self._residues[res_nr].SC[i][1] + offset)
+            chi_atom3 = self._molecule.OBMol.GetAtom(self._residues[res_nr].SC[i][2] + offset)
+            chi_atom4 = self._molecule.OBMol.GetAtom(self._residues[res_nr].SC[i][3] + offset)
+
+            self._molecule.OBMol.GetTorsion(chi_atom1, chi_atom2, chi_atom3, chi_atom4, angle)
+        return
+
+
+
+
+    def get_sequence(self):
+        """ Returns the sequence of the peptide.
+        """
+        return self._sequence
+
+
+    def _calc_charge(self):
+
+        charge = 0
+        for i in self._sequence:
+            charge += aa_dictionary[i].Charge
+        return charge
+
+
+
+
+    def get_charge(self):
+        """ Returns the charge of the peptide.
+        """
+        return self._charge
 
 
     def get_residue_nr(self, atom_nr):
@@ -522,7 +552,8 @@ class peptide:
         exit(1)
 
     def _get_dihedral_constraints(self):
-
+        """ Return a list of backbone and side chain torsion angles (for restraints).
+        """
         restraints = []
 
         backbone_chain = []
@@ -573,14 +604,12 @@ class peptide:
 
         for r in restraints:
             angle = self._molecule.OBMol.GetTorsion(r[0], r[1], r[2], r[3])
-            #print "A", angle, r
             a.append(angle)
 
         for i in range(iterations):
             self.optimize(constraint=True, steps= opt_steps)
             for j, r in enumerate(restraints):
                 self._molecule.OBMol.SetTorsion(r[0], r[1], r[2], r[3], a[j]/180.0*numpy.pi)
-                #print self._molecule.OBMol.GetTorsion(r[0], r[1], r[2], r[3]), a[j]
         return
 
 
@@ -614,6 +643,10 @@ class peptide:
 
         return
 
+    def get_bb_angles(self):
+        """ Returns all backbone angles
+        """
+        return self._get_all_bb_angles()
 
     def sample_chi_angles(self, resnum):
         """ Resamples chi angles for a residue. 
