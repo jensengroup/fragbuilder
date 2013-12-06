@@ -25,6 +25,9 @@
 import numpy as np
 import math
 
+RAD_TO_DEG = 180.0 / np.pi
+DEG_TO_RAD = np.pi / 180.0
+
 def normalvector(v1, v2):
     J = np.cross(v1, v2)
     return J/(np.sqrt(np.dot(J, J)))

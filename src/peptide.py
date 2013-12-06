@@ -2,42 +2,12 @@ import os
 import openbabel
 import uuid
 
+import basilisk_lib
+
 from residues import *
 from math_utils import *
 
-def initialize_bb_angles(residues):
-
-    raise NotImplementedError
-
-
-
-def RotateAwesomeMol(AwesomeMol, Axis, Center, Angle):
-        for Atom in AwesomeMol:
-                #Translate Atom, so Center corresponds to (0,0,0).
-                Atom[1] = Atom[1] - Center
-                #Rotate!
-                Atom[1] = rotate(Atom[1], Axis - Center, Angle)
-                Atom[1] = Atom[1] + Center
-
-        return AwesomeMol
-
-
-def get_charge_sum(sequence):
-
-    charge = 0
-    for i in sequence:
-        charge += aa_dictionary[i].Charge
-    return charge
-
-
 class peptide:
-
-    bb_atoms  = []
-    sc_atoms  = []
-
-    bb_angles = []
-    sc_angles = []
-
 
     def _init_residues(self, sequence):
 
@@ -55,6 +25,18 @@ class peptide:
         for atom in residue.Mol:
             i += 1
         return i
+
+    def _rotate_xyz(self, mol, axis, center, angle):
+        for atom in mol:
+
+                #Translate Atom, so Center corresponds to (0,0,0).
+                atom[1] = atom[1] - center
+                #Rotate!
+                atom[1] = rotate(atom[1], axis - center, angle)
+                atom[1] = atom[1] + center
+
+        return mol
+
 
     def _get_all_bb_angles(self):
 
@@ -108,28 +90,46 @@ class peptide:
 
         return angles
 
+    def print_angles(self):
+        print self._get_all_bb_angles()
 
     def _get_all_sc_angles(self):
         return 0
 
 
-    def __init__(self, init_sequence):
+
+    def __init__(self, init_sequence, nterm="methyl", cterm="methyl"):
+        """ Create a fragbuilder peptide with a specific sequence
+            Default backbone angles are (phi, psi, omega) = (-120, 140, 180).
+
+            Arguments:
+            init_sequence -- sequence in one letter format. E.g. ""GGG""
+            for a triple glycine peptide.
+
+            Keyword arguments:
+            nterm -- Type of cap at the n-terminal. (Default "methyl")
+            cterm -- Type of cap at the c-terminal. (Default "methyl")
+
+            NOTE: Options for cap types are "methyl", "neutral" "charged"
+
+        """
+
+
         self._sequence = init_sequence.upper()
 
-        #default values for n- and c-term state
-        self._state_nterm = "methyl"
-        self._state_cterm = "methyl"
+        self._state_nterm = nterm
+        self._state_cterm = cterm
 
         self._molecule = self._assemble_peptide(self._sequence)
-        self._charge   = get_charge_sum(self._sequence)
+        self._charge   = self._calc_charge()
         self._length   = len(init_sequence)
         self._residues = self._init_residues(init_sequence)
 
+        self._dbn = None
 
-        #self._get_freeze_string()
 
-    # Create a new peptide with identical backbone angles.
-    # For use when mutating residues or terminals.
+
+
     def _reassemble_peptide(self, sequence):
 
         all_bb_angles = self._get_all_bb_angles()
@@ -139,37 +139,6 @@ class peptide:
     def get_smiles(self):
         return self._molecule
 
-    def set_nterm(self, state):
-        if state in ["methyl", "charged", "neutral"]:
-            self._state_nterm = state
-            if state == "methyl":
-                self._residues[0] = LeftMethylCap()
-            elif state == "charged":
-                self._residues[0] = LeftChargedCap()
-            elif state == "neutral":
-                self._residues[0] = LeftNeutralCap()
-
-            # self._molecule = self._reassemble_peptide(self._sequence)
-            self._reassemble_peptide(self._sequence)
-
-        else:
-            print "ERROR: Unsupported n-term,", state
-
-
-
-    def set_cterm(self, state):
-        if state in ["methyl", "charged", "neutral"]:
-            self._state_cterm = state
-            if state == "methyl":
-                self._residues[-1] = RightMethylCap()
-            elif state == "charged":
-                self._residues[-1] = RightChargedCap()
-            elif state == "neutral":
-                self._residues[-1] = RightNeutralCap()
-            self._reassemble_peptide(self._sequence)
-        else:
-            print "ERROR: Unsupported c-term,", state
-
     def write_xyz(self, filename):
         self._molecule.write("xyz", filename, overwrite=True)
 
@@ -178,13 +147,15 @@ class peptide:
         return self._length
 
     def set_residue_bb_angles(self, res_nr, angles):
+
+
         if len(angles) == 3:
-            phi   = angles[0]
-            psi   = angles[1]
-            omega = angles[2]
+            phi   = angles[0] * DEG_TO_RAD
+            psi   = angles[1] * DEG_TO_RAD
+            omega = angles[2] * DEG_TO_RAD
         elif len(angles) == 2:
-            phi   = angles[0]
-            psi   = angles[1]
+            phi   = angles[0]  * DEG_TO_RAD
+            psi   = angles[1]  * DEG_TO_RAD
             omega = math.pi
         else: 
             print "ERROR: Angles must be of type: [phi, psi, omega] or [phi, psi]"
@@ -231,53 +202,17 @@ class peptide:
             if NH2 != None:
                 self._molecule.OBMol.SetTorsion(NH1, CA1, CO1, NH2, psi) #PSI
 
-#       print "It worked!"
 
+    def set_residue_chi_angles(self, res_nr, angles_deg):
+        """ Sets the side chain torsion angles of a residue.
 
-    def set_residue_omega(self, res_nr, angle):
+            Arguments:
+            res_nr -- The index for the residue.
+            angles_deg -- List of chi angles (in degrees).
+        """
 
-        # if self.
-        CA0 = self._molecule.OBMol.GetAtom(self._residues[res_nr - 1].BB[-2] + offset_prev)
-        CO0 = self._molecule.OBMol.GetAtom(self._residues[res_nr - 1].BB[-1] + offset_prev)
-        NH1 = self._molecule.OBMol.GetAtom(self._residues[res_nr].BB[0] + offset_this)
-        CA1 = self._molecule.OBMol.GetAtom(self._residues[res_nr].BB[1] + offset_this)
-        # CO1 = self._molecule.OBMol.GetAtom(self._residues[res_nr].BB[2] + offset_this)
-        # NH2 = self._molecule.OBMol.GetAtom(self._residues[res_nr + 1].BB[0] + offset_next)
+        angles = np.array(angles_deg) * DEG_TO_RAD
 
-        self._molecule.OBMol.SetTorsion(CA0, CO0, NH1, CA1, omega) #Omega
-        # self._molecule.OBMol.SetTorsion(CO0, NH1, CA1, CO1, phi) #PHI
-        # self._molecule.OBMol.SetTorsion(NH1, CA1, CO1, NH2, psi) #PSI
-
-
-    def set_residue_phi(self, res_nr, angle):
-        # CA0 = self._molecule.OBMol.GetAtom(self._residues[res_nr - 1].BB[-2] + offset_prev)
-        CO0 = self._molecule.OBMol.GetAtom(self._residues[res_nr - 1].BB[-1] + offset_prev)
-        NH1 = self._molecule.OBMol.GetAtom(self._residues[res_nr].BB[0] + offset_this)
-        CA1 = self._molecule.OBMol.GetAtom(self._residues[res_nr].BB[1] + offset_this)
-        CO1 = self._molecule.OBMol.GetAtom(self._residues[res_nr].BB[2] + offset_this)
-        # NH2 = self._molecule.OBMol.GetAtom(self._residues[res_nr + 1].BB[0] + offset_next)
-
-        # self._molecule.OBMol.SetTorsion(CA0, CO0, NH1, CA1, omega) #Omega
-        self._molecule.OBMol.SetTorsion(CO0, NH1, CA1, CO1, phi) #PHI
-        # self._molecule.OBMol.SetTorsion(NH1, CA1, CO1, NH2, psi) #PSI
-
-
-    def set_residue_psi(self, res_nr, angle):
-        # CA0 = self._molecule.OBMol.GetAtom(self._residues[res_nr - 1].BB[-2] + offset_prev)
-        # CO0 = self._molecule.OBMol.GetAtom(self._residues[res_nr - 1].BB[-1] + offset_prev)
-        NH1 = self._molecule.OBMol.GetAtom(self._residues[res_nr].BB[0] + offset_this)
-        CA1 = self._molecule.OBMol.GetAtom(self._residues[res_nr].BB[1] + offset_this)
-        CO1 = self._molecule.OBMol.GetAtom(self._residues[res_nr].BB[2] + offset_this)
-        NH2 = self._molecule.OBMol.GetAtom(self._residues[res_nr + 1].BB[0] + offset_next)
-
-        # self._molecule.OBMol.SetTorsion(CA0, CO0, NH1, CA1, omega) #Omega
-        # self._molecule.OBMol.SetTorsion(CO0, NH1, CA1, CO1, phi) #PHI
-        self._molecule.OBMol.SetTorsion(NH1, CA1, CO1, NH2, psi) #PSI
-
-
-
-
-    def set_residue_chi_angles(self, res_nr, angles):
         offset = 0
 
         for i, residue in enumerate(self._residues):
@@ -292,15 +227,7 @@ class peptide:
             chi_atom4 = self._molecule.OBMol.GetAtom(self._residues[res_nr].SC[i][3] + offset)
 
             self._molecule.OBMol.SetTorsion(chi_atom1, chi_atom2, chi_atom3, chi_atom4, angle)
-
-
-    def set_random_chi_angles(self, res_nr):
-        raise NotImplementedError
-
-
-    def set_random_bb_angles(self, res_nr):
-        raise NotImplementedError
-
+        return
 
     _nprocs = 1
     _mem_in_mb = "400mb"
@@ -331,6 +258,7 @@ class peptide:
 
 
     def write_g09_opt_file(self, filename, constraint_dihedral=True):
+        
         output_stream  = "%mem = "
         output_stream += self._mem_in_mb + "\n"
         output_stream += "%nprocs= " + str(self._nprocs)
@@ -352,8 +280,18 @@ class peptide:
         g09_file.close()
 
 
-        def get_sequence(self):
+    def get_sequence(self):
         return self._sequence
+
+
+    def _calc_charge(self):
+
+        charge = 0
+        for i in self._sequence:
+            charge += aa_dictionary[i].Charge
+        return charge
+
+
 
 
     def get_charge(self):
@@ -372,6 +310,7 @@ class peptide:
             for atom in residue.BB:
                 backbone_chain.append(atom + offset)
             offset += atoms_in_residue
+
 
         backbone_chain.sort()
 
@@ -395,10 +334,6 @@ class peptide:
             offset += atoms_in_residue
 
         return freeze_string
-
-
-    def print_sequence(self):
-        print self._sequence
 
     # Returns the peptide as an OBMol with phi/psi angles -120/140 degrees
     # which corresponds to nicely to a straight B-sheet strand.
@@ -438,7 +373,7 @@ class peptide:
             Center1 = ConnectionPoint
 
             #2.2 Rotate all coordinates in the AwesomeMol
-            Fragment[i+1].AwesomeMol = RotateAwesomeMol(Fragment[i+1].AwesomeMol, Axis1, Center1, Angle1)
+            Fragment[i+1].AwesomeMol = self._rotate_xyz(Fragment[i+1].AwesomeMol, Axis1, Center1, Angle1)
 
             #2.3 Get other rotation around the dihedral
             Axis2 = Fragment[i+1].AwesomeMol[Fragment[i+1].BB[1]-1][1] - ConnectionPoint
@@ -461,7 +396,7 @@ class peptide:
             Center2 = ConnectionPoint
 
             #2.4 Rotate all coordinates in the AwesomeMol
-            Fragment[i+1].AwesomeMol = RotateAwesomeMol(Fragment[i+1].AwesomeMol, Axis2, Center2, Angle2)
+            Fragment[i+1].AwesomeMol = self._rotate_xyz(Fragment[i+1].AwesomeMol, Axis2, Center2, Angle2)
 
         # So far the peptide has been assembled with methyl-caps. Now I replace with charged/neutral caps
         # if the n-term and c-term states are not set to "methyl"
@@ -532,31 +467,35 @@ class peptide:
         file_out.close()
 
         mol = pybel.readfile("xyz", temp_xyz).next()
-        for i in range(len(Fragment)-2):
+        for k in range(3):
+            for i in range(len(Fragment)-2):
 
-            ThisResidue = i + 1
-            NextOffset = 0
-            for j in range(ThisResidue+1):
-                NextOffset = NextOffset + len(Fragment[j].Mol.atoms)
-            Offset = 0
-            for j in range(ThisResidue):
-                Offset = Offset + len(Fragment[j].Mol.atoms)
-            PrevOffset = 0
-            for j in range(ThisResidue-1):
-                PrevOffset = PrevOffset + len(Fragment[j].Mol.atoms)
-        try:
-            CA0 = mol.OBMol.GetAtom(Fragment[ThisResidue - 1].BB[-2] + PrevOffset)
-            CO0 = mol.OBMol.GetAtom(Fragment[ThisResidue - 1].BB[-1] + PrevOffset)
-            NH1 = mol.OBMol.GetAtom(Fragment[ThisResidue].BB[0] + Offset)
-            CA1 = mol.OBMol.GetAtom(Fragment[ThisResidue].BB[1] + Offset)
-            CO1 = mol.OBMol.GetAtom(Fragment[ThisResidue].BB[2] + Offset)
-            NH2 = mol.OBMol.GetAtom(Fragment[ThisResidue + 1].BB[0] + NextOffset )
+                ThisResidue = i + 1
+                NextOffset = 0
+                for j in range(ThisResidue+1):
+                    NextOffset = NextOffset + len(Fragment[j].Mol.atoms)
+                Offset = 0
+                for j in range(ThisResidue):
+                    Offset = Offset + len(Fragment[j].Mol.atoms)
+                PrevOffset = 0
+                for j in range(ThisResidue-1):
+                    PrevOffset = PrevOffset + len(Fragment[j].Mol.atoms)
+                #try:
+                CA0 = mol.OBMol.GetAtom(Fragment[ThisResidue - 1].BB[-2] + PrevOffset)
+                CO0 = mol.OBMol.GetAtom(Fragment[ThisResidue - 1].BB[-1] + PrevOffset)
+                NH1 = mol.OBMol.GetAtom(Fragment[ThisResidue].BB[0] + Offset)
+                CA1 = mol.OBMol.GetAtom(Fragment[ThisResidue].BB[1] + Offset)
+                CO1 = mol.OBMol.GetAtom(Fragment[ThisResidue].BB[2] + Offset)
+                NH2 = mol.OBMol.GetAtom(Fragment[ThisResidue + 1].BB[0] + NextOffset )
 
-            mol.OBMol.SetTorsion(CA0, CO0, NH1, CA1, math.pi) #Omega
-            mol.OBMol.SetTorsion(CO0, NH1, CA1, CO1, -120.0/180.0*math.pi)
-            mol.OBMol.SetTorsion(NH1, CA1, CO1, NH2, 140.0/180.0*math.pi)
-        except:
-            temp = 0
+                mol.OBMol.SetTorsion(CA0, CO0, NH1, CA1, math.pi) #Omega
+                mol.OBMol.SetTorsion(CO0, NH1, CA1, CO1, -120.0/180.0*math.pi)
+                mol.OBMol.SetTorsion(NH1, CA1, CO1, NH2, 140.0/180.0*math.pi)
+                #print mol.OBMol.GetTorsion(CA0, CO0, NH1, CA1)
+                #print mol.OBMol.GetTorsion(CO0, NH1, CA1, CO1)
+                #print mol.OBMol.GetTorsion(NH1, CA1, CO1, NH2)
+                #except:
+                #    temp = 0
 
         os.remove(temp_xyz)
 
@@ -564,110 +503,149 @@ class peptide:
 
 
 
-        def get_residue_nr(atom_nr):
-            correct_residue_nr = 0
-            nr_of_atoms_up_to_this_residues = 0
+    def get_residue_nr(self, atom_nr):
+        """ Returns the residue number which has the atom of index atom_nr.
 
-            for i, residue in enumerate(self._residues):
-                nr_of_atoms_up_to_this_residues += self._get_residue_length(residue)
-                if atom_nr <= nr_of_atoms_up_to_this_residues:
-                    return i
-            print "ERROR: Atom nr", atom_nr, "not found.", nr_of_atoms_up_to_this_residues," in molecule."
-            exit(1)
+            Arguments:
+            atom_nr -- Index of the atom in question.
 
-        def print_molecule(self):
-            print self._molecule
+        """
 
+        correct_residue_nr = 0
+        nr_of_atoms_up_to_this_residues = 0
 
-        def add_hbond(self, res_no, atom_type, bonding_partner):
-            raise NotImplementedError
+        for i, residue in enumerate(self._residues):
+            nr_of_atoms_up_to_this_residues += self._get_residue_length(residue)
+            if atom_nr <= nr_of_atoms_up_to_this_residues:
+                return i
+        print "ERROR: Atom nr", atom_nr, "not found.", nr_of_atoms_up_to_this_residues," in molecule."
+        exit(1)
 
+    def _get_dihedral_constraints(self):
 
-        def set_hbond_geom(r_oh, theta, rho):
-            raise NotImplementedError
+        restraints = []
 
+        backbone_chain = []
 
-        def get_dihedral_constraints(self):
+        offset = 0
 
-            restraints = []
-
-            backbone_chain = []
-
-            offset = 0
-
-            for i, residue in enumerate(self._residues):
-                atoms_in_residue = self._get_residue_length(residue)
-                for atom in residue.BB:
-                    backbone_chain.append(atom + offset)
-                offset += atoms_in_residue
-
-            backbone_chain.sort()
+        for i, residue in enumerate(self._residues):
+            atoms_in_residue = self._get_residue_length(residue)
+            for atom in residue.BB:
+                backbone_chain.append(atom + offset)
+            offset += atoms_in_residue
 
 
+        for i in range(len(backbone_chain)-3):
 
-            for i in range(len(backbone_chain)-3):
+            local_restraint = []
 
+            for j in range(4):
+                 local_restraint.append(backbone_chain[i+j])
+            restraints.append(local_restraint)
+
+        offset = 0
+
+        for i, residue in enumerate(self._residues):
+            atoms_in_residue = self._get_residue_length(residue)
+
+            for dihedral in residue.SC:
                 local_restraint = []
 
-                for j in range(4):
-                     local_restraint.append(backbone_chain[i+j])
+                for atom_index in dihedral:
+                    local_restraint.append(atom_index + offset)
                 restraints.append(local_restraint)
-
-            offset = 0
-
-            for i, residue in enumerate(self._residues):
-                atoms_in_residue = self._get_residue_length(residue)
-
-                for dihedral in residue.SC:
-                    local_restraint = []
-
-                    for atom_index in dihedral:
-                        local_restraint.append(atom_index + offset)
-                    restraints.append(local_restraint)
-                offset += atoms_in_residue
+            offset += atoms_in_residue
 
 
-            return restraints
+        return restraints
 
-        def regularize(self, iterations=10, opt_steps = 20):
+    def regularize(self, iterations=10, opt_steps = 20):
+        """ Optimize the structure with fixed torsion angles.
 
-            restraints = self.get_dihedral_constraints()
-            a = []
+            Keyword arguments:
+            iterations -- Number of opimization+angle reset cycles. (default 10)
+            opt_steps -- Number of optimization steps each cycle. (default 20)
 
-            for r in restraints:
-                angle = self._molecule.OBMol.GetTorsion(r[0], r[1], r[2], r[3])
-                a.append(angle)
+        """
+        restraints = self._get_dihedral_constraints()
+        a = []
 
-            for i in range(iterations):
-                self.optimize(constraint=True, steps= opt_steps)
-                for i, r in enumerate(restraints):
-                    self._molecule.OBMol.SetTorsion(r[0], r[1], r[2], r[3], a[i]/180.0*numpy.pi)
-            return
+        for r in restraints:
+            angle = self._molecule.OBMol.GetTorsion(r[0], r[1], r[2], r[3])
+            #print "A", angle, r
+            a.append(angle)
+
+        for i in range(iterations):
+            self.optimize(constraint=True, steps= opt_steps)
+            for j, r in enumerate(restraints):
+                self._molecule.OBMol.SetTorsion(r[0], r[1], r[2], r[3], a[j]/180.0*numpy.pi)
+                #print self._molecule.OBMol.GetTorsion(r[0], r[1], r[2], r[3]), a[j]
+        return
 
 
 
 
-        def optimize(self, constraint=True, steps=100):
-            mol = self._molecule.OBMol
+    def optimize(self, constraint=True, steps=100):
+        """ Perform conjugate gradient optimization with the MMFF94 force field.
 
-            restraints = self.get_dihedral_constraints()
+            Keyword arguments:
+            constraint -- Apply harmonic constraint to dihedral angles. (default True)
+            steps -- Max number of CG steps. (default 100)
 
-            cnstr = openbabel.OBFFConstraints()
+        """
 
+        mol = self._molecule.OBMol
+
+        restraints = self.get_dihedral_constraints()
+
+        cnstr = openbabel.OBFFConstraints()
+
+        if constraint:
             for r in restraints:
                 a = mol.GetTorsion(r[0], r[1], r[2], r[3])
                 cnstr.AddTorsionConstraint(r[0], r[1], r[2], r[3], a)
 
-            FF = openbabel.OBForceField.FindForceField("MMFF94")
-            FF.Setup(mol, cnstr)
-            FF.SetConstraints(cnstr)
-            FF.ConjugateGradients(steps)
-            FF.GetCoordinates(mol)
+        FF = openbabel.OBForceField.FindForceField("MMFF94")
+        FF.Setup(mol, cnstr)
+        FF.SetConstraints(cnstr)
+        FF.ConjugateGradients(steps)
+        FF.GetCoordinates(mol)
+
+        return
 
 
+    def sample_chi_angles(self, resnum):
+        """ Resamples chi angles for a residue. 
+            Returns the new chi angles.
+
+            Arguments:
+            resnum -- number of the residue to resample
+
+        """
+
+        if self._dbn is None:
+            dbn = basilisk_lib.basilisk_dbn()
 
 
+        angles = self._get_all_bb_angles()[resnum - 1]
+        phi = angles[1][0]/180.0*numpy.pi
+        psi = angles[1][1]/180.0*numpy.pi
 
+        aa_letter = self._sequence[resnum - 1]
 
+        aa = int(basilisk_lib.basilisk_utils.one_to_index(aa_letter))
+        chis, bb, ll = dbn.get_sample(aa, phi, psi)
+
+        return chis
+
+    def energy(self):
+        """ Returns the MMFF94 energy of the peptide in kcal/mol.
+
+        """
+        mol = self._molecule.OBMol
+        FF = openbabel.OBForceField.FindForceField("MMFF94")
+        FF.Setup(mol)
+        return FF.Energy()
 
 

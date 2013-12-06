@@ -2,7 +2,7 @@ import pybel
 import string
 import numpy
 
-from settings import *
+fragbuild_dir = "src/"
 
 def ReadCoordzAwesome(Filename):
         ThisAwesomeMol = []
@@ -27,6 +27,7 @@ class LeftMethylCap:
     Filename    = fragbuild_dir + "residues/left.xyz"
     ResName     = "X"
     BB      = [6, 3, 1]
+    #BB      = [3, 1]
     SC      = []
     Rotamer     = []
     def __init__(self):
@@ -40,6 +41,7 @@ class RightMethylCap:
     Filename    = fragbuild_dir + "residues/right.xyz"
     ResName     = "X"
     BB      = [1, 3, 4]
+    #BB      = [1, 3]
     SC      = []
     Rotamer     = []
     def __init__(self):
