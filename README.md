@@ -4,9 +4,14 @@ fragbuilder
 fragbuilder is a tool to create, setup and analyze QM calculations on peptides.
 
 #### Requires:
+Python 2.x
 Openbabel 2.x.x (with Python bindings installed)
+Numpy
 
-Guide to install Open Babel:
+
+Note: fragbuilder will run with most versions of Open Babel, however there was bug in Open Babel which prevented some dihedral angles to be set accurately. If you experience this while using fragbuilder you will have to update your Open Babel.
+
+I have compiled a short guide to install the latest Open Babel here:
 http://combichem.blogspot.dk/2013/12/compiling-open-babel-with-python.html
 
 How to use
@@ -29,7 +34,7 @@ import fragbuilder
 
 5) Look in examples/*.py for inspiration
 
-6) There is not much documentation at this point
+6) There is not much documentation at this point. Type help(openbabel) in a Python shell to access the man pages.
 
 
 How to cite use of fragbuilder:
