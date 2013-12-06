@@ -26,11 +26,14 @@ import sys
 #
 # lets see if we can find biopython
 try:
-  import Bio.PDB
+    import Bio.PDB
 except ImportError :                    
-  sys.stderr.write("This program requires biopython to run. Please make sure you have biopython installed. \nSee http://www.biopython.org for download and help.\n\n")
-  sys.exit() 
-	 
+    """
+    FRAGBUILDER: DOES NOT STRICTLY REQUIRE BioPython
+    """
+    # sys.stderr.write("This program requires biopython to run. Please make sure you have biopython installed. \nSee http://www.biopython.org for download and help.\n\n")
+    # sys.exit()
+
 from os.path import isfile
 
 

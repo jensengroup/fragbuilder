@@ -32,10 +32,10 @@ from src.residues import *
 from src.math_utils import *
 from src.names import *
 from src.peptide import *
-from src.pdb_tools import *
+#from src.pdb_tools import *
 
 # Optional internal modules (disable selectively if you get errors)
-from src.gaussian09_wrapper import *
+#from src.gaussian09_wrapper import *
 
 # Import user settings
 from settings import *
