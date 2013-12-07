@@ -2,7 +2,7 @@ import pybel
 import string
 import numpy
 
-fragbuild_dir = "src/"
+fragbuild_dir = "fragbuilder/"
 
 def ReadCoordzAwesome(Filename):
         ThisAwesomeMol = []
