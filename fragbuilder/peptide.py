@@ -1,4 +1,5 @@
 import os
+import sys
 import openbabel
 import uuid
 
@@ -79,6 +80,20 @@ class peptide:
 
 
         return residues
+
+
+    def get_residue_numbers(self):
+        """ Returns a list with indexes of all amino acids in the chain.
+
+            Can be used for iterating over residues, e.g.:
+
+            >>> for i in pdbfile.get_residue_numbers():
+            ...     print i, pdbfile.get_residue_bb_angles(i)
+        """
+        length = self.get_length()
+
+        return range(1, length + 1)
+
 
 
     def _assemble_peptide(self, Fragment):
@@ -372,6 +387,24 @@ class peptide:
         """ Returns the SMILES string corresponding to the peptide.
         """
         return string.split(str(self._molecule))[0]
+
+    def write_pdb(self, filename, QUIET=False):
+        """ Writes the peptide molecule to a file in .pdb format.
+            This is currently NOT supported when using methyl caps.
+
+        Arguments:
+        filename -- The output filename
+
+        Keyword arguments:
+        QUIET -- Suppress warning regarding methyl caps. (Default False)
+
+        WARNING: Will overwrite an existing file with the same name!
+        WARNING: Unsupported for peptides with methyl caps. Use at own risk!
+
+        """
+        if (self._state_nterm == "methyl" or self._state_cterm == "methyl") and not QUIET:
+            print "WARNING: Output from PDB-files is unsupported for methyl caps. Use at own risk!"
+        self._molecule.write("pdb", filename, overwrite=True)
 
     def write_xyz(self, filename):
         """ Writes the peptide molecule to a file in .xyz format.

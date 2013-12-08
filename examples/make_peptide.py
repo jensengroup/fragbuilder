@@ -4,7 +4,7 @@ import math
 
 sequence = "GLG"
 
-my_peptide = fragbuilder.peptide(sequence, nterm="methyl", cterm="methyl")
+my_peptide = fragbuilder.peptide(sequence, nterm="neutral", cterm="methyl")
 
 print my_peptide.get_smiles()
 print "Charge:  ", my_peptide.get_charge()
@@ -26,6 +26,7 @@ print my_peptide.get_residue_chi_angles(2)
 
 print my_peptide.get_bb_angles()
 my_peptide.write_xyz("D101.xyz")
+my_peptide.write_pdb("D101.pdb", QUIET=False)
 
 
 
