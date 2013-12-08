@@ -105,8 +105,8 @@ class peptide:
 
             if i == 0 and self._state_nterm != "methyl":
                 continue
-            #if i == len(Fragment)-2 and self._state_cterm != "methyl":
-            #    continue
+            if i == len(Fragment)-2 and self._state_cterm != "methyl":
+                continue
             #1.1 Get coordinate of connecting point.
             V3 = Fragment[i].AwesomeMol[Fragment[i].BB[len(Fragment[i].BB) - 1]-1][1]
             V2 = Fragment[i].AwesomeMol[Fragment[i].BB[len(Fragment[i].BB) - 2]-1][1]
@@ -646,7 +646,7 @@ class peptide:
 
         mol = self._molecule.OBMol
 
-        restraints = self.get_dihedral_constraints()
+        restraints = self._get_dihedral_constraints()
 
         cnstr = openbabel.OBFFConstraints()
 
