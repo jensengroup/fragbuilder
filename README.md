@@ -3,6 +3,7 @@ FragBuilder
 
 FragBuilder is a tool to create, setup and analyze QM calculations on peptides.
 
+![alt text](https://dl.dropboxusercontent.com/u/17435887/fragbuilder/cap_neutral.jpg "Di-alanine peptide")
 #### Requires:
  - Python 2.x
  - Openbabel 2.x.x (with Python bindings installed)
@@ -33,8 +34,53 @@ How to use
 #### Documentation:
 
  - Look in examples/\*.py for inspiration
- - Type help(fragbuilder.Peptide) in a Python shell to access most of the documentation. Similar for the other modules (G09_*, etc)
+ - Documentation (i.e. the manual) is written in doc-strings. See the modules below.
+ - Also see the paper -- a link is coming soon(TM)!
+
+### The turbo-manual:
+
+Below is list of all classes currently in the **fragbuilder** Python library. The manual for each class is accessed though the built-in help function. A short description of each class and the code to access the corresponding help page is as follows:
+
+**fragbuilder.Peptide** class:
+
+This class makes peptides, defines the geometry, optimizes geometries, writes files, etc.
+
+    from fragbuilder import Peptide
+    help(Peptide)
+
+**fragbuilder.G09_opt** class:  
+**fragbuilder.G09_NMR** class:  
+**fragbuilder.G09_energy** class:
+
+These classes will write an Gaussian 09 input file for either geometry optimization, NMR shielding calculations or single point energies.
+
+    from fragbuilder import G09_opt, G09_NMR, G09_energy
+    help(G09_opt)
+    help(G09_NMR)
+    help(G09_energy)
+
+**fragbuilder.Basilisk_DBN** class:
  
+This class wraps the dbn class from the original BASILISK library. The only real difference is that it returns angles in degrees in order to be compatible with the rest of FragBuilder
+
+    from fragbuilder import Basilisk_DBN
+    help(Basilisk_DBN)
+
+
+**fragbuilder.PDB** class:
+ 
+This class is a PDB-filereader which can read backbone and side chain torsion angles from a PDB file. 
+
+    from fragbuilder import PDB
+    help(PDB)
+
+NOTE: The **fragbuilder.PDB** class is under development and currently requires Biopython to function (The rest of FragBuilder will work even if Biopython is not installed). I am in the process of removing either this class from FragBuilder or remove the dependency on Biopython.
+
+Get help, report bugs, request features, etc:
+===============================
+
+You can use all the tools available here at GitHub or you can also contact me directly at this address: andersx [å] nano.ku.dk
+
 
 How to cite:
 ===============================
