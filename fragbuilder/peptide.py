@@ -7,7 +7,7 @@ import basilisk_lib
 
 from residues import *
 from math_utils import *
-class peptide:
+class Peptide:
     """ Usually instantiated from something like:
 
         my_peptide = frabuilder.peptide("DAAAK", nterm="methyl", cterm="methyl")
@@ -418,13 +418,27 @@ class peptide:
         self._molecule.write("xyz", filename, overwrite=True)
 
 
+    def write_file(self, extension, filename):
+        """ Writes the peptide molecule to a file in arbitrary formats.
+        Consult the Open Babel documentation for a list of supported file types.
+
+        Arguments:
+        filetype -- File extension
+        filename -- The output filename
+
+        WARNING: Will overwrite an existing file with the same name!
+
+        """
+        self._molecule.write(extension, filename, overwrite=True)
+
+
     def get_length(self):
         """ Returns the number of residues in the peptide.
 
         """
         return self._length
 
-    def set_residue_bb_angles(self, res_nr, angles_deg):
+    def set_bb_angles(self, res_nr, angles_deg):
         """ Set the phi, phsi and omega angles of a residue (in degrees).
 
             Arguments:
@@ -450,7 +464,7 @@ class peptide:
             sys.exit(1)
 
         if res_nr < 1 or res_nr > len(self._residues) - 2:
-                        print "ERROR: Error in set_residue_bb_angles. User supplied index:", res_nr, "Allowed range: 1 -", len(self._residues) - 2
+                        print "ERROR: Error in set_bb_angles. User supplied index:", res_nr, "Allowed range: 1 -", len(self._residues) - 2
                         sys.exit(1)
 
         offset_prev = 0
@@ -490,7 +504,7 @@ class peptide:
         return
 
 
-    def set_residue_chi_angles(self, res_nr, angles_deg):
+    def set_chi_angles(self, res_nr, angles_deg):
         """ Sets the side chain torsion angles of a residue.
 
             Arguments:
@@ -523,7 +537,7 @@ class peptide:
         return
 
 
-    def get_residue_bb_angles(self, resnum):
+    def get_bb_angles(self, resnum):
         """ Returns the [phi, psi, omega] of the side chain of the residue.
 
             Arguments:
@@ -534,7 +548,7 @@ class peptide:
         return angles[1]
 
 
-    def get_residue_chi_angles(self, res_nr):
+    def get_chi_angles(self, res_nr):
         """ Returns the chi-angles of the side chain of the residue.
 
             Arguments:
@@ -696,7 +710,7 @@ class peptide:
 
         return
 
-    def get_bb_angles(self):
+    def get_all_bb_angles(self):
         """ Returns all backbone angles
         """
         return self._get_all_bb_angles()
@@ -711,7 +725,7 @@ class peptide:
         return a * RAD_TO_DEG
 
 
-    def sample_residue_bb_angles(self, resnum):
+    def sample_bb_angles(self, resnum):
         """ Resamples phi and psi angles for a residue.
             Returns the new [phi, psi] angles.
 
@@ -723,20 +737,20 @@ class peptide:
         """
 
         if self._dbn is None:
-            dbn = basilisk_lib.basilisk_dbn()
+            self._dbn = basilisk_lib.basilisk_dbn()
 
         aa_letter = self._sequence[resnum - 1]
         aa = int(basilisk_lib.basilisk_utils.one_to_index(aa_letter))
-        chis, bb, ll = dbn.get_sample(aa)
+        chis, bb, ll = self._dbn.get_sample(aa)
 
         angles_deg = [self._basilisk_to_deg(bb[0]),
                       self._basilisk_to_deg(bb[1])]
 
-        self.set_residue_bb_angles(resnum, angles_deg)
+        self.set_bb_angles(resnum, angles_deg)
 
         return angles_deg
 
-    def sample_residue_chi_angles(self, resnum, bb_dependency=True):
+    def sample_chi_angles(self, resnum, bb_dependency=True):
         """ Resamples chi angles for a residue from BASILISK. 
             Returns the new chi angles.
 
@@ -752,7 +766,7 @@ class peptide:
         """
 
         if self._dbn is None:
-            dbn = basilisk_lib.basilisk_dbn()
+            self._dbn = basilisk_lib.basilisk_dbn()
 
 
         angles = self._get_all_bb_angles()[resnum - 1]
@@ -764,15 +778,15 @@ class peptide:
         aa = int(basilisk_lib.basilisk_utils.one_to_index(aa_letter))
 
         if bb_dependency:
-            chis, bb, ll = dbn.get_sample(aa, phi, psi)
+            chis, bb, ll = self._dbn.get_sample(aa, phi, psi)
         else:
-            chis, bb, ll = dbn.get_sample(aa)
+            chis, bb, ll = self._dbn.get_sample(aa)
 
         chis_deg = []
         for chi in chis:
             chis_deg.append(self._basilisk_to_deg(chi))
 
-        self.set_residue_chi_angles(resnum, chis_deg)
+        self.set_chi_angles(resnum, chis_deg)
 
         return chis_deg
 
