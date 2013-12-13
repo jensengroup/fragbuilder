@@ -36,14 +36,33 @@ import fragbuilder
 
 6) Type help(fragbuilder) in a Python shell to access the documentation.
 
-help(fragbuilder.peptide) will give you the user documentation for most of fragbuilder's functionality.
+help(fragbuilder.Peptide) will give you the user documentation for most of fragbuilder's functionality.
 
-How to cite use of fragbuilder:
+How to cite:
 ===============================
+
 For now do something like this:
 "fragbuilder" (2013) Anders S. Christensen, Jan H. Jensen, https://github.com/andersx/fragbuilder 
 There will be a proper paper on arXiv shortly.
 
+The use of the functions from the BASILISK library (e.g. Peptide.sample\_bb\_angles(), Peptide.sample\_chi\_angles(), etc.) should cite:
+
+Tim Harder, Wouter Boomsma,  Martin Paluszewski, Jes Frellesen, Kristoffer E. Johansson, and Thomas Hamelryck,  (2010). Beyond rotamers: a generative, probabilistic model of
+side chains in proteins. BMC Bioinformatics, 11:306–318.
+
+
+
+Additional use of Open Babel should cite:
+
+Noel M. O'Boyle, Michael Banck, Craig A James, Chris Morley, Tim Vandermeersch and Geoffrey R Hutchison (2011) Open Babel: An open chemical toolbox. Journal of Cheminformatics, 3:33-46.
+
+
+
 Licensing
 =========
-fragbuilder is licensed under the two-clause BSD license which mean you can pretty much do whatever you want as long as you cite properly and/or mentions the name of the authors. fragbuilder also packages the BASILISK library under the terms of the Gnu GPL.
+fragbuilder is licensed under the two-clause BSD license which mean you can pretty much do whatever you want as long as you cite properly and/or mentions the name of the authors. 
+
+The BASILISK library which is included is licensed under the terms of the Gnu General Public License. Is also available from SourceForge: https://sourceforge.net/projects/basilisk-dbn/
+
+
+
