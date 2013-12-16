@@ -3,7 +3,7 @@ FragBuilder
 
 FragBuilder is a tool to create, setup and analyze QM calculations on peptides.
 
-![alt text](https://dl.dropboxusercontent.com/u/17435887/fragbuilder/cap_neutral.jpg "Di-alanine peptide")
+![alt text](https://dl.dropboxusercontent.com/u/17435887/fragbuilder/model_angles_crop.png "Di-alanine peptide")
 #### Requires:
  - Python 2.x
  - Openbabel 2.x.x (with Python bindings installed)
@@ -97,7 +97,7 @@ The use of the functions from the BASILISK library (e.g. Peptide.sample\_bb\_ang
 side chains in proteins. BMC Bioinformatics, 11:306–318.
 
 
-#### Open BAbel:
+#### Open Babel:
 Additional use of Open Babel should cite:
 
 - Noel M. O'Boyle, Michael Banck, Craig A James, Chris Morley, Tim Vandermeersch and Geoffrey R Hutchison (2011) Open Babel: An open chemical toolbox. Journal of Cheminformatics, 3:33-46.
