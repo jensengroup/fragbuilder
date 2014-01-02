@@ -104,11 +104,10 @@ class PDB:
             CA1 = res_1['CA'].get_vector()
             C1  = res_1['C' ].get_vector()
             N2  = res_2['N' ].get_vector()
-            CA2 = res_2['CA'].get_vector()
 
             phi   = None
             psi   = calc_dihedral(N1, CA1, C1, N2) * RAD_TO_DEG
-            omega = calc_dihedral(CA1, C1, N2, CA2) * RAD_TO_DEG
+            omega = None
 
             angles_deg = [phi, psi, omega]
 
@@ -117,6 +116,7 @@ class PDB:
             res_0 = self._chain[resnum - 1]
             res_1 = self._chain[resnum]
 
+            CA0 = res_0['CA'].get_vector()
             C0  = res_0['C' ].get_vector()
             N1  = res_1['N' ].get_vector()
             CA1 = res_1['CA'].get_vector()
@@ -124,7 +124,7 @@ class PDB:
 
             phi   = calc_dihedral(C0, N1, CA1, C1) * RAD_TO_DEG
             psi   = None
-            omega = None
+            omega = calc_dihedral(CA0, C0, N1, CA1) * RAD_TO_DEG
 
             angles_deg = [phi, psi, omega]
 
@@ -134,16 +134,16 @@ class PDB:
             res_1 = self._chain[resnum]
             res_2 = self._chain[resnum + 1]
 
+            CA0 = res_0['CA'].get_vector()
             C0  = res_0['C' ].get_vector()
             N1  = res_1['N' ].get_vector()
             CA1 = res_1['CA'].get_vector()
             C1  = res_1['C' ].get_vector()
             N2  = res_2['N' ].get_vector()
-            CA2 = res_2['CA'].get_vector()
 
             phi   = calc_dihedral(C0, N1, CA1, C1) * RAD_TO_DEG
             psi   = calc_dihedral(N1, CA1, C1, N2) * RAD_TO_DEG
-            omega = calc_dihedral(CA1, C1, N2, CA2) * RAD_TO_DEG
+            omega = calc_dihedral(CA0, C0, N1, CA1) * RAD_TO_DEG
 
             angles_deg = [phi, psi, omega]
 
@@ -277,16 +277,17 @@ class PDB:
                     chi2 = calc_dihedral(sc_atom2, sc_atom3, sc_atom4, sc_atom5)
                     return [chi1, chi2]
             if residue.get_resname() == 'PRO':
-                    sc_atom1 = residue['N'].get_vector()
-                    sc_atom2 = residue['CA'].get_vector()
-                    sc_atom3 = residue['CB'].get_vector()
-                    sc_atom4 = residue['CG'].get_vector()
-                    sc_atom5 = residue['CD'].get_vector()
-                    chi1 = calc_dihedral(sc_atom1, sc_atom2, sc_atom3, sc_atom4)
-                    chi2 = calc_dihedral(sc_atom2, sc_atom3, sc_atom4, sc_atom5)
-                    chi3 = calc_dihedral(sc_atom3, sc_atom4, sc_atom5, sc_atom1)
-                    chi4 = calc_dihedral(sc_atom4, sc_atom5, sc_atom1, sc_atom2)
-                    return [chi1, chi2, chi3, chi4]
+                    # sc_atom1 = residue['N'].get_vector()
+                    # sc_atom2 = residue['CA'].get_vector()
+                    # sc_atom3 = residue['CB'].get_vector()
+                    # sc_atom4 = residue['CG'].get_vector()
+                    # sc_atom5 = residue['CD'].get_vector()
+                    # chi1 = calc_dihedral(sc_atom1, sc_atom2, sc_atom3, sc_atom4)
+                    # chi2 = calc_dihedral(sc_atom2, sc_atom3, sc_atom4, sc_atom5)
+                    # chi3 = calc_dihedral(sc_atom3, sc_atom4, sc_atom5, sc_atom1)
+                    # chi4 = calc_dihedral(sc_atom4, sc_atom5, sc_atom1, sc_atom2)
+                    # return [chi1, chi2, chi3, chi4]
+                    return []
             if residue.get_resname() == 'SER':
                     sc_atom1 = residue['N'].get_vector()
                     sc_atom2 = residue['CA'].get_vector()
@@ -334,6 +335,21 @@ class PDB:
         for model in structure:
             for chain in model:
                 return chain
+
+    def get_sequence(self):
+
+        return self._get_sequence_from_chain(self._chain)
+
+
+
+    def _get_sequence_from_chain(self, chain):
+
+        sequence = ""
+
+        for residue in chain:
+            sequence += three_to_one(residue.get_resname())
+
+        return sequence
 
     # def _calc_phi_psi(self, chain):
     #     for poly_index, poly in enumerate(self._polypeptide):
