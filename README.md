@@ -31,13 +31,15 @@ How to use
 
     import fragbuilder
 
-#### Documentation:
+Documentation
+=============
 
- - Look in examples/\*.py for inspiration
- - Documentation (i.e. the manual) is written in doc-strings. See the modules below.
- - Also see the paper -- a link is coming soon(TM)!
+First off, the paper on PeerJ is probably the first place to go in order to get familiar with Fragbuilder. Second, I recommend looking in the examples folder. This should cover most use-cases and functionality. I have also writte a couple of blog-posts (more to come!).
 
-### The turbo-manual:
+ - See the paper here: http://dx.doi.org/10.7287/peerj.preprints.169v2
+ - Look in examples/\*.py for inspiration.
+ - Installation help: http://combichem.blogspot.com/2013/12/fragbuilder-installation.html
+ - Setup a scan of peptide conformations: http://combichem.blogspot.com/2014/01/fragbuilder-setting-up-scan-of-peptide.html
 
 Below is list of all classes currently in the **fragbuilder** Python library. The manual for each class is accessed though the built-in help function. A short description of each class and the code to access the corresponding help page is as follows:
 
@@ -45,8 +47,7 @@ Below is list of all classes currently in the **fragbuilder** Python library. Th
 
 This class makes peptides, defines the geometry, optimizes geometries, writes files, etc.
 
-    from fragbuilder import Peptide
-    help(Peptide)
+[fragbuilder.Peptide documentation](https://rawgithub.com/jensengroup/fragbuilder/master/doc/fragbuilder.Peptide.html)
 
 **fragbuilder.G09_opt** class:  
 **fragbuilder.G09_NMR** class:  
@@ -54,25 +55,24 @@ This class makes peptides, defines the geometry, optimizes geometries, writes fi
 
 These classes will write an Gaussian 09 input file for either geometry optimization, NMR shielding calculations or single point energies.
 
-    from fragbuilder import G09_opt, G09_NMR, G09_energy
-    help(G09_opt)
-    help(G09_NMR)
-    help(G09_energy)
+[fragbuilder.G09_opt documentation](https://rawgithub.com/jensengroup/fragbuilder/master/doc/fragbuilder.G09_opt.html)  
+[fragbuilder.G09_NMR documentation](https://rawgithub.com/jensengroup/fragbuilder/master/doc/fragbuilder.G09_NMR.html)  
+[fragbuilder.G09_energy documentation](https://rawgithub.com/jensengroup/fragbuilder/master/doc/fragbuilder.G09_energy.html)
 
 **fragbuilder.Basilisk_DBN** class:
  
-This class wraps the dbn class from the original BASILISK library. The only real difference is that it returns angles in degrees in order to be compatible with the rest of FragBuilder
+This class wraps the dbn class from the original BASILISK library. The only real difference is that it returns angles in degrees in order to be compatible with the rest of FragBuilder.
+For most practical purposes, this wrapper is not needed. Most likely you want to use the Peptide.sample_bb_angles(args) or Peptide.sample_chi_angles(args) functionality in order to invoke BASILISK library. 
 
-    from fragbuilder import Basilisk_DBN
-    help(Basilisk_DBN)
+[fragbuilder.Basilisk_DBN documentation](https://rawgithub.com/jensengroup/fragbuilder/master/doc/fragbuilder.Basilisk_DBN.html)
 
 
 **fragbuilder.PDB** class:
  
 This class is a PDB-filereader which can read backbone and side chain torsion angles from a PDB file. 
 
-    from fragbuilder import PDB
-    help(PDB)
+[fragbuilder.PDB documentation](https://rawgithub.com/jensengroup/fragbuilder/master/doc/fragbuilder.PDB.html)
+
 
 NOTE: The **fragbuilder.PDB** class is under development and currently requires Biopython to function (The rest of FragBuilder will work even if Biopython is not installed). I am in the process of removing either this class from FragBuilder or remove the dependency on Biopython.
 
