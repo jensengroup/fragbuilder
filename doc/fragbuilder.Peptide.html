@@ -1,0 +1,139 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html><head><title>Python: class Peptide</title>
+</head><body bgcolor="#f0f0f8">
+<p>
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
+<tr bgcolor="#ffc8d8">
+<td colspan=3 valign=bottom>&nbsp;<br>
+<font color="#000000" face="helvetica, arial"><strong>fragbuilder.Peptide</strong> = <a name="fragbuilder.Peptide">class Peptide</a></font></td></tr>
+    
+<tr bgcolor="#ffc8d8"><td rowspan=2><tt>&nbsp;&nbsp;&nbsp;</tt></td>
+<td colspan=2><tt>Usually&nbsp;instantiated&nbsp;from&nbsp;something&nbsp;like:<br>
+&nbsp;<br>
+my_peptide&nbsp;=&nbsp;frabuilder.peptide("DAAAK",&nbsp;nterm="methyl",&nbsp;cterm="methyl")<br>
+&nbsp;<br>
+NOTE:&nbsp;All&nbsp;functions&nbsp;use&nbsp;DEGREES&nbsp;as&nbsp;units&nbsp;if&nbsp;the&nbsp;have&nbsp;angles&nbsp;as&nbsp;input/output&nbsp;<br>
+format.&nbsp;Radians&nbsp;are&nbsp;exclusively&nbsp;used&nbsp;internally&nbsp;in&nbsp;functions&nbsp;and&nbsp;are&nbsp;never<br>
+passed&nbsp;on.<br>&nbsp;</tt></td></tr>
+<tr><td>&nbsp;</td>
+<td width="100%">Methods defined here:<br>
+<dl><dt><a name="Peptide-__init__"><strong>__init__</strong></a>(self, init_sequence, nterm<font color="#909090">='methyl'</font>, cterm<font color="#909090">='methyl'</font>)</dt><dd><tt>Create&nbsp;a&nbsp;fragbuilder&nbsp;peptide&nbsp;with&nbsp;a&nbsp;specific&nbsp;sequence.<br>
+E.g.&nbsp;"GGG"&nbsp;for&nbsp;a&nbsp;triple&nbsp;glycine&nbsp;peptide.<br>
+Default&nbsp;backbone&nbsp;angles&nbsp;are&nbsp;(phi,&nbsp;psi,&nbsp;omega)&nbsp;=&nbsp;(-120,&nbsp;140,&nbsp;180).<br>
+&nbsp;<br>
+Arguments:<br>
+init_sequence&nbsp;--&nbsp;sequence&nbsp;in&nbsp;one&nbsp;letter&nbsp;format.&nbsp;<br>
+&nbsp;<br>
+Keyword&nbsp;arguments:<br>
+nterm&nbsp;--&nbsp;Type&nbsp;of&nbsp;cap&nbsp;at&nbsp;the&nbsp;n-terminal.&nbsp;(Default&nbsp;"methyl")<br>
+cterm&nbsp;--&nbsp;Type&nbsp;of&nbsp;cap&nbsp;at&nbsp;the&nbsp;c-terminal.&nbsp;(Default&nbsp;"methyl")<br>
+&nbsp;<br>
+NOTE:&nbsp;Options&nbsp;for&nbsp;cap&nbsp;types&nbsp;are&nbsp;"methyl",&nbsp;"neutral"&nbsp;"charged"</tt></dd></dl>
+
+<dl><dt><a name="Peptide-get_all_bb_angles"><strong>get_all_bb_angles</strong></a>(self)</dt><dd><tt>Returns&nbsp;all&nbsp;backbone&nbsp;angles</tt></dd></dl>
+
+<dl><dt><a name="Peptide-get_bb_angles"><strong>get_bb_angles</strong></a>(self, resnum)</dt><dd><tt>Returns&nbsp;the&nbsp;[phi,&nbsp;psi,&nbsp;omega]&nbsp;of&nbsp;the&nbsp;side&nbsp;chain&nbsp;of&nbsp;the&nbsp;residue.<br>
+&nbsp;<br>
+Arguments:<br>
+res_nr&nbsp;--&nbsp;The&nbsp;residue&nbsp;for&nbsp;which&nbsp;to&nbsp;calculate&nbsp;phi-,&nbsp;psi-&nbsp;and&nbsp;omega-angles.</tt></dd></dl>
+
+<dl><dt><a name="Peptide-get_charge"><strong>get_charge</strong></a>(self)</dt><dd><tt>Returns&nbsp;the&nbsp;charge&nbsp;of&nbsp;the&nbsp;peptide.</tt></dd></dl>
+
+<dl><dt><a name="Peptide-get_chi_angles"><strong>get_chi_angles</strong></a>(self, res_nr)</dt><dd><tt>Returns&nbsp;the&nbsp;chi-angles&nbsp;of&nbsp;the&nbsp;side&nbsp;chain&nbsp;of&nbsp;the&nbsp;residue.<br>
+&nbsp;<br>
+Arguments:<br>
+res_nr&nbsp;--&nbsp;The&nbsp;residue&nbsp;for&nbsp;which&nbsp;to&nbsp;calculate&nbsp;chi-angles.</tt></dd></dl>
+
+<dl><dt><a name="Peptide-get_energy"><strong>get_energy</strong></a>(self)</dt><dd><tt>Returns&nbsp;the&nbsp;MMFF94&nbsp;energy&nbsp;of&nbsp;the&nbsp;peptide&nbsp;in&nbsp;kcal/mol.</tt></dd></dl>
+
+<dl><dt><a name="Peptide-get_length"><strong>get_length</strong></a>(self)</dt><dd><tt>Returns&nbsp;the&nbsp;number&nbsp;of&nbsp;residues&nbsp;in&nbsp;the&nbsp;peptide.</tt></dd></dl>
+
+<dl><dt><a name="Peptide-get_residue_numbers"><strong>get_residue_numbers</strong></a>(self)</dt><dd><tt>Returns&nbsp;a&nbsp;list&nbsp;with&nbsp;indexes&nbsp;of&nbsp;all&nbsp;amino&nbsp;acids&nbsp;in&nbsp;the&nbsp;chain.<br>
+&nbsp;<br>
+Can&nbsp;be&nbsp;used&nbsp;for&nbsp;iterating&nbsp;over&nbsp;residues,&nbsp;e.g.:<br>
+&nbsp;<br>
+&gt;&gt;&gt;&nbsp;for&nbsp;i&nbsp;in&nbsp;pdbfile.<a href="#fragbuilder.Peptide-get_residue_numbers">get_residue_numbers</a>():<br>
+...&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;print&nbsp;i,&nbsp;pdbfile.get_residue_bb_angles(i)</tt></dd></dl>
+
+<dl><dt><a name="Peptide-get_sequence"><strong>get_sequence</strong></a>(self)</dt><dd><tt>Returns&nbsp;the&nbsp;sequence&nbsp;of&nbsp;the&nbsp;peptide.</tt></dd></dl>
+
+<dl><dt><a name="Peptide-get_smiles"><strong>get_smiles</strong></a>(self)</dt><dd><tt>Returns&nbsp;the&nbsp;SMILES&nbsp;string&nbsp;corresponding&nbsp;to&nbsp;the&nbsp;peptide.</tt></dd></dl>
+
+<dl><dt><a name="Peptide-optimize"><strong>optimize</strong></a>(self, constraint<font color="#909090">=True</font>, steps<font color="#909090">=100</font>)</dt><dd><tt>Perform&nbsp;conjugate&nbsp;gradient&nbsp;optimization&nbsp;with&nbsp;the&nbsp;MMFF94&nbsp;force&nbsp;field.<br>
+&nbsp;<br>
+Keyword&nbsp;arguments:<br>
+constraint&nbsp;--&nbsp;Apply&nbsp;harmonic&nbsp;constraint&nbsp;to&nbsp;dihedral&nbsp;angles.&nbsp;(default&nbsp;True)<br>
+steps&nbsp;--&nbsp;Max&nbsp;number&nbsp;of&nbsp;CG&nbsp;steps.&nbsp;(default&nbsp;100)</tt></dd></dl>
+
+<dl><dt><a name="Peptide-regularize"><strong>regularize</strong></a>(self, iterations<font color="#909090">=10</font>, opt_steps<font color="#909090">=20</font>)</dt><dd><tt>Optimize&nbsp;the&nbsp;structure&nbsp;with&nbsp;fixed&nbsp;torsion&nbsp;angles.<br>
+&nbsp;<br>
+Keyword&nbsp;arguments:<br>
+iterations&nbsp;--&nbsp;Number&nbsp;of&nbsp;opimization+angle&nbsp;reset&nbsp;cycles.&nbsp;(default&nbsp;10)<br>
+opt_steps&nbsp;--&nbsp;Number&nbsp;of&nbsp;optimization&nbsp;steps&nbsp;each&nbsp;cycle.&nbsp;(default&nbsp;20)</tt></dd></dl>
+
+<dl><dt><a name="Peptide-sample_bb_angles"><strong>sample_bb_angles</strong></a>(self, resnum)</dt><dd><tt>Resamples&nbsp;phi&nbsp;and&nbsp;psi&nbsp;angles&nbsp;for&nbsp;a&nbsp;residue.<br>
+Returns&nbsp;the&nbsp;new&nbsp;[phi,&nbsp;psi]&nbsp;angles.<br>
+&nbsp;<br>
+Arguments:<br>
+resnum&nbsp;--&nbsp;number&nbsp;of&nbsp;the&nbsp;residue&nbsp;to&nbsp;resample<br>
+&nbsp;<br>
+NB:&nbsp;This&nbsp;function&nbsp;sets&nbsp;the&nbsp;phi&nbsp;and&nbsp;psi&nbsp;angles&nbsp;to&nbsp;new&nbsp;values.</tt></dd></dl>
+
+<dl><dt><a name="Peptide-sample_chi_angles"><strong>sample_chi_angles</strong></a>(self, resnum, bb_dependency<font color="#909090">=True</font>)</dt><dd><tt>Resamples&nbsp;chi&nbsp;angles&nbsp;for&nbsp;a&nbsp;residue&nbsp;from&nbsp;BASILISK.&nbsp;<br>
+Returns&nbsp;the&nbsp;new&nbsp;chi&nbsp;angles.<br>
+&nbsp;<br>
+Arguments:<br>
+resnum&nbsp;--&nbsp;number&nbsp;of&nbsp;the&nbsp;residue&nbsp;to&nbsp;resample<br>
+&nbsp;<br>
+Keyword&nbsp;arguments:<br>
+bb_dependency&nbsp;--&nbsp;Whether&nbsp;to&nbsp;sample&nbsp;chi&nbsp;angles&nbsp;taking&nbsp;<br>
+phi/psi&nbsp;angles&nbsp;into&nbsp;account&nbsp;in&nbsp;BASILISK&nbsp;sampling.&nbsp;(default&nbsp;True)<br>
+&nbsp;<br>
+NB:&nbsp;This&nbsp;function&nbsp;sets&nbsp;the&nbsp;chi&nbsp;angles&nbsp;to&nbsp;new&nbsp;values.</tt></dd></dl>
+
+<dl><dt><a name="Peptide-set_bb_angles"><strong>set_bb_angles</strong></a>(self, res_nr, angles_deg)</dt><dd><tt>Set&nbsp;the&nbsp;phi,&nbsp;phsi&nbsp;and&nbsp;omega&nbsp;angles&nbsp;of&nbsp;a&nbsp;residue&nbsp;(in&nbsp;degrees).<br>
+&nbsp;<br>
+Arguments:<br>
+res_nr&nbsp;--&nbsp;The&nbsp;residue&nbsp;number.<br>
+angles&nbsp;--&nbsp;A&nbsp;list&nbsp;in&nbsp;the&nbsp;format:&nbsp;[phi,&nbsp;psi,&nbsp;omega]<br>
+&nbsp;<br>
+NOTE:&nbsp;angles&nbsp;can&nbsp;be&nbsp;given&nbsp;as&nbsp;[phi,&nbsp;psi]&nbsp;in&nbsp;which&nbsp;case&nbsp;omega&nbsp;is<br>
+assumed&nbsp;=&nbsp;180&nbsp;degrees.</tt></dd></dl>
+
+<dl><dt><a name="Peptide-set_chi_angles"><strong>set_chi_angles</strong></a>(self, res_nr, angles_deg)</dt><dd><tt>Sets&nbsp;the&nbsp;side&nbsp;chain&nbsp;torsion&nbsp;angles&nbsp;of&nbsp;a&nbsp;residue.<br>
+&nbsp;<br>
+Arguments:<br>
+res_nr&nbsp;--&nbsp;The&nbsp;index&nbsp;for&nbsp;the&nbsp;residue.<br>
+angles_deg&nbsp;--&nbsp;List&nbsp;of&nbsp;chi&nbsp;angles&nbsp;(in&nbsp;degrees).</tt></dd></dl>
+
+<dl><dt><a name="Peptide-write_file"><strong>write_file</strong></a>(self, extension, filename)</dt><dd><tt>Writes&nbsp;the&nbsp;peptide&nbsp;molecule&nbsp;to&nbsp;a&nbsp;file&nbsp;in&nbsp;arbitrary&nbsp;formats.<br>
+Consult&nbsp;the&nbsp;Open&nbsp;Babel&nbsp;documentation&nbsp;for&nbsp;a&nbsp;list&nbsp;of&nbsp;supported&nbsp;file&nbsp;types.<br>
+&nbsp;<br>
+Arguments:<br>
+filetype&nbsp;--&nbsp;File&nbsp;extension<br>
+filename&nbsp;--&nbsp;The&nbsp;output&nbsp;filename<br>
+&nbsp;<br>
+WARNING:&nbsp;Will&nbsp;overwrite&nbsp;an&nbsp;existing&nbsp;file&nbsp;with&nbsp;the&nbsp;same&nbsp;name!</tt></dd></dl>
+
+<dl><dt><a name="Peptide-write_pdb"><strong>write_pdb</strong></a>(self, filename, QUIET<font color="#909090">=False</font>)</dt><dd><tt>Writes&nbsp;the&nbsp;peptide&nbsp;molecule&nbsp;to&nbsp;a&nbsp;file&nbsp;in&nbsp;.pdb&nbsp;format.<br>
+&nbsp;&nbsp;&nbsp;&nbsp;This&nbsp;is&nbsp;currently&nbsp;NOT&nbsp;supported&nbsp;when&nbsp;using&nbsp;methyl&nbsp;caps.<br>
+&nbsp;<br>
+Arguments:<br>
+filename&nbsp;--&nbsp;The&nbsp;output&nbsp;filename<br>
+&nbsp;<br>
+Keyword&nbsp;arguments:<br>
+QUIET&nbsp;--&nbsp;Suppress&nbsp;warning&nbsp;regarding&nbsp;methyl&nbsp;caps.&nbsp;(Default&nbsp;False)<br>
+&nbsp;<br>
+WARNING:&nbsp;Will&nbsp;overwrite&nbsp;an&nbsp;existing&nbsp;file&nbsp;with&nbsp;the&nbsp;same&nbsp;name!<br>
+WARNING:&nbsp;Unsupported&nbsp;for&nbsp;peptides&nbsp;with&nbsp;methyl&nbsp;caps.&nbsp;Use&nbsp;at&nbsp;own&nbsp;risk!</tt></dd></dl>
+
+<dl><dt><a name="Peptide-write_xyz"><strong>write_xyz</strong></a>(self, filename)</dt><dd><tt>Writes&nbsp;the&nbsp;peptide&nbsp;molecule&nbsp;to&nbsp;a&nbsp;file&nbsp;in&nbsp;.xyz&nbsp;format.<br>
+&nbsp;<br>
+Arguments:<br>
+filename&nbsp;--&nbsp;The&nbsp;output&nbsp;filename<br>
+&nbsp;<br>
+WARNING:&nbsp;Will&nbsp;overwrite&nbsp;an&nbsp;existing&nbsp;file&nbsp;with&nbsp;the&nbsp;same&nbsp;name!</tt></dd></dl>
+
+</td></tr></table>
+</body></html>

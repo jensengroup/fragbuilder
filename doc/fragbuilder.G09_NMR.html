@@ -1,0 +1,76 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html><head><title>Python: class G09_NMR</title>
+</head><body bgcolor="#f0f0f8">
+<p>
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
+<tr bgcolor="#ffc8d8">
+<td colspan=3 valign=bottom>&nbsp;<br>
+<font color="#000000" face="helvetica, arial"><strong>fragbuilder.G09_NMR</strong> = <a name="fragbuilder.G09_NMR">class G09_NMR</a>(<a href="fragbuilder.gaussian09_wrapper.html#G09_base">G09_base</a>)</font></td></tr>
+    
+<tr bgcolor="#ffc8d8"><td rowspan=2><tt>&nbsp;&nbsp;&nbsp;</tt></td>
+<td colspan=2><tt>Class&nbsp;to&nbsp;setup&nbsp;a&nbsp;Gaussian&nbsp;09&nbsp;NMR&nbsp;chemical&nbsp;shielding&nbsp;<br>
+calculation&nbsp;from&nbsp;a&nbsp;peptide.<br>
+&nbsp;<br>
+Requires&nbsp;a&nbsp;peptide&nbsp;objec.&nbsp;A&nbsp;simple&nbsp;use&nbsp;case&nbsp;could&nbsp;be:<br>
+&nbsp;<br>
+from&nbsp;fragbuilder&nbsp;import&nbsp;Peptide,&nbsp;G09_NMR<br>
+pep&nbsp;=&nbsp;fragbuilder.Peptide("GGGG")<br>
+opt&nbsp;=&nbsp;G09_NMR(pep)<br>
+opt.<a href="#fragbuilder.G09_NMR-write_com">write_com</a>()<br>&nbsp;</tt></td></tr>
+<tr><td>&nbsp;</td>
+<td width="100%">Methods defined here:<br>
+<dl><dt><a name="G09_NMR-__init__"><strong>__init__</strong></a>(self, pep)</dt><dd><tt>Class&nbsp;to&nbsp;generate&nbsp;input&nbsp;file&nbsp;for&nbsp;a&nbsp;Gaussian&nbsp;NMR&nbsp;shielding&nbsp;calculation.<br>
+&nbsp;<br>
+Arguments:<br>
+peptide&nbsp;--&nbsp;A&nbsp;an&nbsp;object&nbsp;of&nbsp;fragbuilder.Peptide&nbsp;type.</tt></dd></dl>
+
+<dl><dt><a name="G09_NMR-write_com"><strong>write_com</strong></a>(self, filename)</dt><dd><tt>Writes&nbsp;a&nbsp;Gaussian&nbsp;09&nbsp;optimization&nbsp;optimization&nbsp;.com&nbsp;file.<br>
+&nbsp;<br>
+Arguments:<br>
+filename&nbsp;--&nbsp;Name&nbsp;of&nbsp;the&nbsp;file&nbsp;&nbsp;to&nbsp;be&nbsp;written.<br>
+&nbsp;<br>
+NOTES:&nbsp;The&nbsp;default&nbsp;header&nbsp;is:<br>
+&nbsp;<br>
+%mem=1gb<br>
+%nprocs=1<br>
+#p&nbsp;nmr=giao&nbsp;b3lyp/6-311G+(2d,p)<br>
+&nbsp;<br>
+WARNING:&nbsp;Will&nbsp;overwrite&nbsp;an&nbsp;existing&nbsp;file&nbsp;with&nbsp;the&nbsp;same&nbsp;name.</tt></dd></dl>
+
+<hr>
+Methods inherited from <a href="fragbuilder.gaussian09_wrapper.html#G09_base">G09_base</a>:<br>
+<dl><dt><a name="G09_NMR-set_comment"><strong>set_comment</strong></a>(self, comment)</dt><dd><tt>Set&nbsp;the&nbsp;comment&nbsp;section&nbsp;of&nbsp;the&nbsp;input&nbsp;Gaussian&nbsp;09&nbsp;.com&nbsp;file.</tt></dd></dl>
+
+<dl><dt><a name="G09_NMR-set_header"><strong>set_header</strong></a>(self, header)</dt><dd><tt>Set&nbsp;the&nbsp;header&nbsp;of&nbsp;the&nbsp;put&nbsp;Gaussian&nbsp;09&nbsp;.com&nbsp;file.<br>
+&nbsp;<br>
+E.g:<br>
+com.<a href="#fragbuilder.G09_NMR-set_header">set_header</a>("%mem=2gb\n#&nbsp;opt&nbsp;B3LYP/6-31G(d)")<br>
+&nbsp;<br>
+WARNING:&nbsp;Using&nbsp;this&nbsp;option&nbsp;overrides&nbsp;all&nbsp;other&nbsp;header&nbsp;options!</tt></dd></dl>
+
+<dl><dt><a name="G09_NMR-set_memory"><strong>set_memory</strong></a>(self, amount)</dt><dd><tt>Set&nbsp;amount&nbsp;of&nbsp;memory&nbsp;of&nbsp;the&nbsp;input&nbsp;Gaussian&nbsp;09&nbsp;.com&nbsp;file.<br>
+&nbsp;<br>
+E.g:<br>
+com.<a href="#fragbuilder.G09_NMR-set_memory">set_memory</a>("2gb")</tt></dd></dl>
+
+<dl><dt><a name="G09_NMR-set_method"><strong>set_method</strong></a>(self, command)</dt><dd><tt>Set&nbsp;the&nbsp;method&nbsp;and&nbsp;basis&nbsp;set&nbsp;in&nbsp;the&nbsp;input&nbsp;Gaussian&nbsp;09&nbsp;.com&nbsp;<br>
+file&nbsp;using&nbsp;standard&nbsp;Gaussian&nbsp;09&nbsp;notation.<br>
+&nbsp;<br>
+E.g.:&nbsp;<br>
+com.<a href="#fragbuilder.G09_NMR-set_method">set_method</a>("B3LYP/6-31G(d)")</tt></dd></dl>
+
+<dl><dt><a name="G09_NMR-set_nprocs"><strong>set_nprocs</strong></a>(self, nprocs)</dt><dd><tt>Set&nbsp;the&nbsp;nprocs&nbsp;keyword&nbsp;of&nbsp;the&nbsp;input&nbsp;Gaussian&nbsp;09&nbsp;.com&nbsp;file.<br>
+&nbsp;<br>
+E.g:<br>
+com.<a href="#fragbuilder.G09_NMR-set_nprocs">set_nprocs</a>(8)</tt></dd></dl>
+
+<dl><dt><a name="G09_NMR-set_solvent"><strong>set_solvent</strong></a>(self, solvent_type)</dt><dd><tt>Set&nbsp;the&nbsp;header&nbsp;of&nbsp;the&nbsp;input&nbsp;Gaussian&nbsp;09&nbsp;.com&nbsp;file.<br>
+&nbsp;<br>
+E.g:<br>
+com.<a href="#fragbuilder.G09_NMR-set_solvent">set_solvent</a>("water")<br>
+&nbsp;<br>
+This&nbsp;inserts&nbsp;the&nbsp;keyword&nbsp;"scrf=(solvent=water)".</tt></dd></dl>
+
+</td></tr></table>
+</body></html>

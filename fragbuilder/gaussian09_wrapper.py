@@ -76,7 +76,16 @@ class G09_base:
 
 
 class G09_opt(G09_base):
+    """ Class to setup a Gaussian 09 optimization from a
+        a peptide.
 
+        Requires a peptide objec. A simple use case could be:
+
+        from fragbuilder import Peptide, G09_opt
+        pep = fragbuilder.Peptide("GGGG")
+        opt = G09_opt(pep)
+        opt.write_com()
+    """
     def __init__(self, pep):
         """ Class to generate input file for a Gaussian optimization.
 
@@ -185,6 +194,16 @@ class G09_opt(G09_base):
 
 
 class G09_energy(G09_base):
+    """ Class to setup a Gaussian 09 single point energy 
+        calculation from a peptide.
+
+        Requires a peptide objec. A simple use case could be:
+
+        from fragbuilder import Peptide, G09_energy
+        pep = fragbuilder.Peptide("GGGG")
+        opt = G09_energy(pep)
+        opt.write_com()
+    """
 
     def __init__(self, pep):
         """ Class to generate input file for a Gaussian optimization.
@@ -240,6 +259,16 @@ class G09_energy(G09_base):
 
 
 class G09_NMR(G09_base):
+    """ Class to setup a Gaussian 09 NMR chemical shielding 
+        calculation from a peptide.
+
+        Requires a peptide objec. A simple use case could be:
+
+        from fragbuilder import Peptide, G09_NMR
+        pep = fragbuilder.Peptide("GGGG")
+        opt = G09_NMR(pep)
+        opt.write_com()
+    """
 
     def __init__(self, pep):
         """ Class to generate input file for a Gaussian NMR shielding calculation.
