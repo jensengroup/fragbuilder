@@ -305,7 +305,7 @@ class Leucine:
     Filename    = fragbuild_dir + "residues/leu.xyz"
     ResName     = "L"
     BB      = [1, 3, 6]
-    SC      = [[1,3,5,9],[3,5,9,13]]
+    SC      = [[1,3,5,9],[3,5,9,12]]
     Rotamer     = [[ 62,  80],
               [-177,  65],
               [-172, 145],
