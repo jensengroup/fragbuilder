@@ -74,8 +74,6 @@ This class is a PDB-filereader which can read backbone and side chain torsion an
 [fragbuilder.PDB documentation](https://rawgithub.com/jensengroup/fragbuilder/master/doc/fragbuilder.PDB.html)
 
 
-NOTE: The **fragbuilder.PDB** class is under development and currently requires Biopython to function (The rest of FragBuilder will work even if Biopython is not installed). I am in the process of removing either this class from FragBuilder or remove the dependency on Biopython.
-
 Get help, report bugs, request features, etc:
 ===============================
 

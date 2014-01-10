@@ -21,5 +21,4 @@ print "List of backbone phi/psi/omega angles:"
 
 for i in pdbfile.get_residue_numbers():
     print i, pdbfile.get_resname(i) , pdbfile.get_residue_bb_angles(i), pdbfile.get_residue_chi_angles(i)
-    #print i, pdbfile.get_resname(i), pdbfile.get_residue_chi_angles(i)
 

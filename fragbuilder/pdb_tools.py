@@ -4,15 +4,15 @@ import sys
 from math_utils import *
 from names import *
 
-
+from bio_pdb import PDBParser
+from bio_pdb import is_aa
+from bio_pdb import calc_dihedral
 
 class PDB:
     """ Usually instantiated from something like:
 
         pdbfile = fragbuilder.PDB("1UBQ.pdb")
 
-        NOTE: This module requires Biopython to function. Will throw an error if
-        Biopython is not installed. See http://www.biopython.org for download and help.
     """
 
 
@@ -23,19 +23,7 @@ class PDB:
             Arguments:
             pdbfile -- The PDB file you wish to read.
 
-            WARNING: Will throw an error if Bio.PDB cannot be imported.
         """
-        # Workaround for not having the entire fragbuilder module require
-        # Biopython.
-        try:
-            import Bio.PDB
-        except ImportError :
-            sys.stderr.write("The PDB class requires Biopython to run. Please make sure you have biopython installed.\n See http://www.biopython.org for download and help.\n\n")
-            sys.exit()
-
-        from Bio.PDB import PDBParser
-        #from Bio.PDB import PPBuilder
-
         try:
             self._parser = PDBParser(QUIET=True)
         except:
@@ -53,9 +41,6 @@ class PDB:
     def get_length(self):
         """ Returns the length of the protein.
         """
-
-        from Bio.PDB import is_aa
-
         length = 0
         for residue in self._chain:
             if is_aa(residue):
@@ -98,8 +83,6 @@ class PDB:
             Arguments:
             resnum -- The number of the residue.
         """
-        from Bio.PDB import calc_dihedral
-
         length = self.get_length()
 
         angles_deg = []
@@ -160,7 +143,7 @@ class PDB:
 
 
     def _get_chi(self, residue):
-            from Bio.PDB import calc_dihedral
+            """ Returns a list of chi angles for a residue """
             if residue.get_resname() == 'ALA':
                     return []
             if residue.get_resname() == 'GLY':
@@ -367,25 +350,31 @@ class PDB:
 
 
     def _get_first_chain(self, structure):
+        """ Returns the first chain in a Bio.PDB structure object """
         for model in structure:
             for chain in model:
                 return chain
 
     def get_sequence(self):
-
+        """ Returns the amino acid sequence from the PDB structure. """
         return self._sequence
 
 
     def get_resname(self, resnum):
+        """ Returns the three letter code for a residue in the PDB file.
+            E.g. "VAL", "ALA", etc.
+
+            Arguments:
+            resnum -- The number of the residue
+        """
+
         letter = self._sequence[resnum - 1]
         return one_to_three(letter)
 
 
 
     def _get_sequence_from_chain(self, chain):
-
-        from Bio.PDB import is_aa
-
+        """ Extracts the amino acid sequence from a Bio.PDB chain object """
         sequence = ""
 
         for residue in chain:
