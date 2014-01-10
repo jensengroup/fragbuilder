@@ -46,9 +46,8 @@ class PDB:
         self._pdbfile = pdbfile
         self._structure = self._parser.get_structure("pdb", self._pdbfile)
         self._chain = self._get_first_chain(self._structure)
-        #self._polypeptide = PPBuilder().build_peptides(self._chain)
 
-        #self._phipsi = None
+        self._sequence = self._get_sequence_from_chain(self._chain)
 
 
     def get_length(self):
@@ -77,7 +76,14 @@ class PDB:
         return range(1, length + 1)
 
     def get_residue_chi_angles(self, resnum):
-        """ Returns a list of chi angles for residue #resnum.
+        """ Returns a list of chi angles for a residue.
+
+            Arguments:
+            resnum -- The number of the residue.
+
+            NOTE: Also corrects for incorrect naming of CG1/CG2 in
+            valine residues and CD1/CD2 in leucine residues.
+            Will th
         """
         angles_rad = self._get_chi(self._chain[resnum])
 
@@ -87,7 +93,10 @@ class PDB:
 
 
     def get_residue_bb_angles(self, resnum):
-        """ Returns a list of [phi, psi, omega] angles for residue #resnum.
+        """ Returns a list of [phi, psi, omega] angles for a residue.
+
+            Arguments:
+            resnum -- The number of the residue.
         """
         from Bio.PDB import calc_dihedral
 
@@ -240,6 +249,19 @@ class PDB:
                     sc_atom3 = residue['CB'].get_vector()
                     sc_atom4 = residue['CG'].get_vector()
                     sc_atom5 = residue['CD1'].get_vector()
+
+                    sc_atom5_b = residue['CD2'].get_vector()
+
+                    # Check for correct naming of CD1/CD2
+                    check_angle = calc_dihedral(sc_atom5, sc_atom4, sc_atom3, sc_atom5_b)
+
+                    # If the naming of the CD1 and CD2 atoms is correct,
+                    # the check_angle will be around -120 deg. If the names
+                    # are swapped, the angle will be around 120 deg.
+                    if check_angle > 0:
+                        sc_atom5 = sc_atom5_b
+                        print "WARNING: Correcting for incorrect naming of CD1 and CD2 in residue LEU%i." %  residue.get_id()[1]
+
                     chi1 = calc_dihedral(sc_atom1, sc_atom2, sc_atom3, sc_atom4)
                     chi2 = calc_dihedral(sc_atom2, sc_atom3, sc_atom4, sc_atom5)
                     return [chi1, chi2]
@@ -325,6 +347,19 @@ class PDB:
                     sc_atom2 = residue['CA'].get_vector()
                     sc_atom3 = residue['CB'].get_vector()
                     sc_atom4 = residue['CG1'].get_vector()
+
+                    sc_atom4_b = residue['CG2'].get_vector()
+
+                    # Check for correct naming of CG1/CG2
+                    check_angle = calc_dihedral(sc_atom4, sc_atom3, sc_atom2, sc_atom4_b)
+
+                    # If the naming of the CG1 and CG2 atoms is correct,
+                    # the check_angle will be around -120 deg. If the names
+                    # are swapped, the angle will be around 120 deg.
+                    if check_angle > 0:
+                        sc_atom4 = sc_atom4_b
+                        print "WARNING: Correcting for incorrect naming of CG1 and CG2 in residue VAL%i." %  residue.get_id()[1]
+
                     chi1 = calc_dihedral(sc_atom1, sc_atom2, sc_atom3, sc_atom4)
                     return [chi1]
             else:
@@ -338,73 +373,27 @@ class PDB:
 
     def get_sequence(self):
 
-        return self._get_sequence_from_chain(self._chain)
+        return self._sequence
+
+
+    def get_resname(self, resnum):
+        letter = self._sequence[resnum - 1]
+        return one_to_three(letter)
 
 
 
     def _get_sequence_from_chain(self, chain):
 
+        from Bio.PDB import is_aa
+
         sequence = ""
 
         for residue in chain:
-            sequence += three_to_one(residue.get_resname())
+            if is_aa(residue):
+                sequence += three_to_one(residue.get_resname())
+            else: 
+                break
 
         return sequence
-
-    # def _calc_phi_psi(self, chain):
-    #     for poly_index, poly in enumerate(self._polypeptide):
-    #         return poly.get_phi_psi_list()
-
-
-
-
-    # def _read_angles(self, filename):
-    #     """ Returns a dictionary with the following format:
-
-    #         resnum is the number of a residue
-
-    #         d[resnum]['resname']    : Returns the residue name
-    #         d[resnum]['res_letter'] : Returns the one letter residue code
-    #         d[resnum]['bb_angles']  : Returns a list containing [phi, psi]
-    #         d[resnum]['chi_angles'] : Returns a list containing chi angles
-    #     """
-
-    #     from Bio.PDB import is_aa
-    #     chain = get_first_chain(filename)
-
-    #     phipsi_angles = read_phi_psi(chain)
-
-    #     first_residue_id = 0
-    #     for residue in chain:
-    #         if is_aa(residue):
-    #             first_residue_id = residue.get_id()[1]
-    #             break
-
-    #     angles_dictionary = dict()
-
-    #     for residue in chain:
-    #         if not is_aa(residue):
-    #             continue
-    #         angles_dictionary[residue.get_id()[1]] = dict()
-
-    #         angles_dictionary[residue.get_id()[1]]['res_name'] = residue.get_resname()
-    #         angles_dictionary[residue.get_id()[1]]['res_letter'] = three_to_one(residue.get_resname())
-
-    #         phi = phipsi_angles[residue.get_id()[1]-first_residue_id][0]
-    #         if phi is not None:
-    #             phi *= RAD_TO_DEG
-    #         psi = phipsi_angles[residue.get_id()[1]-first_residue_id][1]
-    #         if psi is not None:
-    #             psi *= RAD_TO_DEG
-
-    #         angles_dictionary[residue.get_id()[1]]['bb_angles'] = [phi, psi]  
-
-    #         chi_angles = []
-    #         for chi_angle in get_chi(residue):
-    #             chi_angles.append(chi_angle * RAD_TO_DEG)
-
-    #         angles_dictionary[residue.get_id()[1]]['chi_angles'] = chi_angles
-
-    #     return angles_dictionary
 
 

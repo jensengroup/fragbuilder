@@ -482,20 +482,6 @@ class Valine:
         self.AwesomeMol = ReadCoordzAwesome(self.Filename)
 
 
-class Valine:
-    Charge      = 0
-    Index       = 2
-    Filename    = fragbuild_dir + "residues/val.xyz"
-    ResName     = "V"
-    BB      = [1, 3, 6]
-    SC      = [[1, 3, 5, 8]]
-    Rotamer     = [[63],
-                  [175],
-              [-60]]
-    def __init__(self):
-        self.Mol = pybel.readfile("xyz", self.Filename).next()
-        self.AwesomeMol = ReadCoordzAwesome(self.Filename)
-
 # Dictionary of amino acids and their constructors
 aa_dictionary = dict([('G', Glycine       ),
               ('A', Alanine       ),

@@ -47,6 +47,7 @@ d1_to_index={}
 dindex_to_1={}
 d3_to_index={}
 dindex_to_3={}
+d1_to_d3={}
 
 for i in range(0, 20):
     n1=aa1[i]
@@ -55,6 +56,8 @@ for i in range(0, 20):
     dindex_to_1[i]=n1
     d3_to_index[n3]=i
     dindex_to_3[i]=n3
+
+    d1_to_d3[n1]=n3
 
 def index_to_one(index):
     "Amino acid index to single letter (eg 0 to A)"
@@ -79,5 +82,5 @@ def three_to_one(s):
 
 def one_to_three(s):
     "Amino acid single letter to three letter (eg A to ALA)"
-    i=d1_to_index[s]
-
+    i=d1_to_d3[s]
+    return i
