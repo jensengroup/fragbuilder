@@ -74,10 +74,17 @@ This class is a PDB-filereader which can read backbone and side chain torsion an
 [fragbuilder.PDB documentation](https://rawgithub.com/jensengroup/fragbuilder/master/doc/fragbuilder.PDB.html)
 
 
-Get help, report bugs, request features, etc:
+Get help, report bugs, feature requests, etc:
 ===============================
 
 You can use all the tools available here at GitHub or you can also contact me directly at this address: andersx [å] nano.ku.dk
+
+I have the following functionality in the making (may be in the development branch):
+ 
+- Handling of protonation states.
+- Module that uses TorusDBN to sample backbone angles.
+- Module to write Gaussian spin-spin coupling input files.
+
 
 
 How to cite:
