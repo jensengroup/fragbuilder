@@ -2,12 +2,49 @@ import basilisk_lib
 
 from math_utils import DEG_TO_RAD, RAD_TO_DEG
 
-import math 
+import math
+import numpy.random
+import random
+
+def set_seed(seed):
+    """
+    Sets the random seed for the Basilisk_DBN module. If no
+    seed is specified, the seeding will be random.
+
+    Arguments:
+    seed -- the input seed
+
+    NOTE: In reality this function uses the following code:
+
+        numpy.random.seed(seed)
+        random.seed(seed+1)
+
+    So beware if you set these elsewhere for now as this
+    might produce unexpected results
+    """
+
+    # Developer notes:
+    # Note that numpy.random and random use
+    # completely different algorithms, so even 
+    # with the same seed the will produce 
+    # different numbers. Both need to be set
+    # because they are both used in the.
+
+    numpy.random.seed(seed)
+    random.seed(seed+1)
+
 
 class Basilisk_DBN:
     """
     A wrapper class for access to the BASILISK DBN class
     via fragbuilder.
+
+    You can set the random seed the following way:
+
+        from fragbuilder import set_seed
+
+        set_seed(some_number)
+
     """
     def __init__(self):
         """

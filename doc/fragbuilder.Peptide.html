@@ -78,7 +78,10 @@ Returns&nbsp;the&nbsp;new&nbsp;[phi,&nbsp;psi]&nbsp;angles.<br>
 Arguments:<br>
 resnum&nbsp;--&nbsp;number&nbsp;of&nbsp;the&nbsp;residue&nbsp;to&nbsp;resample<br>
 &nbsp;<br>
-NB:&nbsp;This&nbsp;function&nbsp;sets&nbsp;the&nbsp;phi&nbsp;and&nbsp;psi&nbsp;angles&nbsp;to&nbsp;new&nbsp;values.</tt></dd></dl>
+NB:&nbsp;This&nbsp;function&nbsp;sets&nbsp;the&nbsp;phi&nbsp;and&nbsp;psi&nbsp;angles&nbsp;to&nbsp;new&nbsp;values.<br>
+NOTE:&nbsp;Random&nbsp;seeds&nbsp;can&nbsp;be&nbsp;set&nbsp;via&nbsp;the&nbsp;set_seed()&nbsp;function:<br>
+&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;fragbuilder.set_seed(some_number)</tt></dd></dl>
 
 <dl><dt><a name="Peptide-sample_chi_angles"><strong>sample_chi_angles</strong></a>(self, resnum, bb_dependency<font color="#909090">=True</font>)</dt><dd><tt>Resamples&nbsp;chi&nbsp;angles&nbsp;for&nbsp;a&nbsp;residue&nbsp;from&nbsp;BASILISK.&nbsp;<br>
 Returns&nbsp;the&nbsp;new&nbsp;chi&nbsp;angles.<br>
@@ -90,7 +93,11 @@ Keyword&nbsp;arguments:<br>
 bb_dependency&nbsp;--&nbsp;Whether&nbsp;to&nbsp;sample&nbsp;chi&nbsp;angles&nbsp;taking&nbsp;<br>
 phi/psi&nbsp;angles&nbsp;into&nbsp;account&nbsp;in&nbsp;BASILISK&nbsp;sampling.&nbsp;(default&nbsp;True)<br>
 &nbsp;<br>
-NB:&nbsp;This&nbsp;function&nbsp;sets&nbsp;the&nbsp;chi&nbsp;angles&nbsp;to&nbsp;new&nbsp;values.</tt></dd></dl>
+NB:&nbsp;This&nbsp;function&nbsp;sets&nbsp;the&nbsp;chi&nbsp;angles&nbsp;to&nbsp;new&nbsp;values.<br>
+&nbsp;<br>
+NOTE:&nbsp;Random&nbsp;seeds&nbsp;can&nbsp;be&nbsp;set&nbsp;via&nbsp;the&nbsp;set_seed()&nbsp;function:<br>
+&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;fragbuilder.set_seed(some_number)</tt></dd></dl>
 
 <dl><dt><a name="Peptide-set_bb_angles"><strong>set_bb_angles</strong></a>(self, res_nr, angles_deg)</dt><dd><tt>Set&nbsp;the&nbsp;phi,&nbsp;phsi&nbsp;and&nbsp;omega&nbsp;angles&nbsp;of&nbsp;a&nbsp;residue&nbsp;(in&nbsp;degrees).<br>
 &nbsp;<br>

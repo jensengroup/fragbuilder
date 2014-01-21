@@ -733,6 +733,9 @@ class Peptide:
             resnum -- number of the residue to resample
 
             NB: This function sets the phi and psi angles to new values.
+            NOTE: Random seeds can be set via the set_seed() function:
+
+                fragbuilder.set_seed(some_number)
 
         """
 
@@ -762,6 +765,10 @@ class Peptide:
             phi/psi angles into account in BASILISK sampling. (default True)
 
             NB: This function sets the chi angles to new values.
+
+            NOTE: Random seeds can be set via the set_seed() function:
+
+                fragbuilder.set_seed(some_number)
 
         """
 

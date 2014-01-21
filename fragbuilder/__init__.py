@@ -7,6 +7,7 @@ from gaussian09_wrapper import G09_NMR
 from pdb_tools import PDB
 
 from basilisk_wrapper import Basilisk_DBN
+from basilisk_wrapper import set_seed
 
 __author__ = "Anders S. Christensen"
 __copyright__ = "Copyright 2013, jensengroup"
