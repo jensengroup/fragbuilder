@@ -60,7 +60,7 @@ class PDB:
 
         return range(1, length + 1)
 
-    def get_residue_chi_angles(self, resnum):
+    def get_chi_angles(self, resnum):
         """ Returns a list of chi angles for a residue.
 
             Arguments:
@@ -77,7 +77,7 @@ class PDB:
         return angles_deg
 
 
-    def get_residue_bb_angles(self, resnum):
+    def get_bb_angles(self, resnum):
         """ Returns a list of [phi, psi, omega] angles for a residue.
 
             Arguments:

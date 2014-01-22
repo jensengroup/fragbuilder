@@ -27,8 +27,8 @@ for i in pdb.get_residue_numbers():
     for j in [-1, 0, 1]:
 
         # Read backbone and chi angles from pdb object
-        bb = pdb.get_residue_bb_angles(i + j)
-        chi = pdb.get_residue_chi_angles(i + j)
+        bb = pdb.get_bb_angles(i + j)
+        chi = pdb.get_chi_angles(i + j)
 
         # Set matching angles in the Peptide object
         pep.set_bb_angles(2 + j, bb)
