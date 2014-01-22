@@ -682,11 +682,11 @@ class Peptide:
 
 
 
-    def optimize(self, constraint=True, steps=100):
+    def optimize(self, constraint=False, steps=100):
         """ Perform conjugate gradient optimization with the MMFF94 force field.
 
             Keyword arguments:
-            constraint -- Apply harmonic constraint to dihedral angles. (default True)
+            constraint -- Apply harmonic constraint to dihedral angles. (default False)
             steps -- Max number of CG steps. (default 100)
 
         """
