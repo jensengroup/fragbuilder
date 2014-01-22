@@ -68,7 +68,7 @@ class PDB:
 
             NOTE: Also corrects for incorrect naming of CG1/CG2 in
             valine residues and CD1/CD2 in leucine residues.
-            Will th
+            Will display an error if .pdb file is incorrect.
         """
         angles_rad = self._get_chi(self._chain[resnum])
 

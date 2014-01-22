@@ -60,10 +60,10 @@ Can&nbsp;be&nbsp;used&nbsp;for&nbsp;iterating&nbsp;over&nbsp;residues,&nbsp;e.g.
 
 <dl><dt><a name="Peptide-get_smiles"><strong>get_smiles</strong></a>(self)</dt><dd><tt>Returns&nbsp;the&nbsp;SMILES&nbsp;string&nbsp;corresponding&nbsp;to&nbsp;the&nbsp;peptide.</tt></dd></dl>
 
-<dl><dt><a name="Peptide-optimize"><strong>optimize</strong></a>(self, constraint<font color="#909090">=True</font>, steps<font color="#909090">=100</font>)</dt><dd><tt>Perform&nbsp;conjugate&nbsp;gradient&nbsp;optimization&nbsp;with&nbsp;the&nbsp;MMFF94&nbsp;force&nbsp;field.<br>
+<dl><dt><a name="Peptide-optimize"><strong>optimize</strong></a>(self, constraint<font color="#909090">=False</font>, steps<font color="#909090">=100</font>)</dt><dd><tt>Perform&nbsp;conjugate&nbsp;gradient&nbsp;optimization&nbsp;with&nbsp;the&nbsp;MMFF94&nbsp;force&nbsp;field.<br>
 &nbsp;<br>
 Keyword&nbsp;arguments:<br>
-constraint&nbsp;--&nbsp;Apply&nbsp;harmonic&nbsp;constraint&nbsp;to&nbsp;dihedral&nbsp;angles.&nbsp;(default&nbsp;True)<br>
+constraint&nbsp;--&nbsp;Apply&nbsp;harmonic&nbsp;constraint&nbsp;to&nbsp;dihedral&nbsp;angles.&nbsp;(default&nbsp;False)<br>
 steps&nbsp;--&nbsp;Max&nbsp;number&nbsp;of&nbsp;CG&nbsp;steps.&nbsp;(default&nbsp;100)</tt></dd></dl>
 
 <dl><dt><a name="Peptide-regularize"><strong>regularize</strong></a>(self, iterations<font color="#909090">=10</font>, opt_steps<font color="#909090">=20</font>)</dt><dd><tt>Optimize&nbsp;the&nbsp;structure&nbsp;with&nbsp;fixed&nbsp;torsion&nbsp;angles.<br>
