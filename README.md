@@ -17,8 +17,8 @@ I have compiled a short guide to install the latest Open Babel here:
 http://combichem.blogspot.dk/2013/12/compiling-open-babel-with-python.html
 
 If you're interested in FragBuilder, you might also be interested in PeptideBuilder (very similar to FragBuilder):
-https://github.com/mtien/PeptideBuilder/
-https://peerj.com/articles/80/
+- https://github.com/mtien/PeptideBuilder/
+- https://peerj.com/articles/80/
 
 How to use
 ==========
