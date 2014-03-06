@@ -3,6 +3,8 @@ FragBuilder
 
 FragBuilder is a tool to create, setup and analyze QM calculations on peptides.
 
+BREAKING NEWS: The Official FragBuilder paper is out: https://peerj.com/articles/277/
+
 ![alt text](https://dl.dropboxusercontent.com/u/17435887/fragbuilder/model_angles_crop.png "Di-alanine peptide")
 #### Requires:
  - Python 2.x
@@ -96,19 +98,19 @@ How to cite:
 
 #### FragBuilder:
 The FragBuilder paper is currently pending peer-review at PeerJ. Meanwhile, you can cite the preprint, also available from PeerJ.
-- Anders S. Christensen, Thomas Hamelryck, Jan H. Jensen (2013) FragBuilder: An efficient Python library to setup quantum chemistry calculations on peptides models. PeerJ PrePrints 1:e169v2 http://dx.doi.org/10.7287/peerj.preprints.169v2
+- Anders S. Christensen, Thomas Hamelryck, Jan H. Jensen (2013) FragBuilder: An efficient Python library to setup quantum chemistry calculations on peptides models. PeerJ 2:e277 http://dx.doi.org/10.7717/peerj.277
 
 #### BASILISK:
 The use of the functions from the BASILISK library (e.g. Peptide.sample\_bb\_angles(), Peptide.sample\_chi\_angles(), etc.) should cite:
 
 - Tim Harder, Wouter Boomsma,  Martin Paluszewski, Jes Frellesen, Kristoffer E. Johansson, and Thomas Hamelryck  (2010). Beyond rotamers: a generative, probabilistic model of
-side chains in proteins. BMC Bioinformatics, 11:306–318.
+side chains in proteins. BMC Bioinformatics, 11:306–318. http://dx.doi.org/10.1186/1471-2105-11-306
 
 
 #### Open Babel:
 Additional use of Open Babel should cite:
 
-- Noel M. O'Boyle, Michael Banck, Craig A James, Chris Morley, Tim Vandermeersch and Geoffrey R Hutchison (2011) Open Babel: An open chemical toolbox. Journal of Cheminformatics, 3:33-46.
+- Noel M. O'Boyle, Michael Banck, Craig A James, Chris Morley, Tim Vandermeersch and Geoffrey R Hutchison (2011) Open Babel: An open chemical toolbox. Journal of Cheminformatics, 3:33-46. http://dx.doi.org/10.1186/1758-2946-3-33
 
 
 
