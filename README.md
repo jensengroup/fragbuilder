@@ -91,13 +91,16 @@ I have the following functionality in the making (may be in the development bran
 - Module that uses TorusDBN to sample backbone angles.
 - Module to write Gaussian spin-spin coupling input files.
 
+Contact me if you have more ideas!
+
 
 
 How to cite:
 ===============================
 
 #### FragBuilder:
-The FragBuilder paper is currently pending peer-review at PeerJ. Meanwhile, you can cite the preprint, also available from PeerJ.
+The use of FragBuilder should cite our PeerJ publication:
+
 - Anders S. Christensen, Thomas Hamelryck, Jan H. Jensen (2013) FragBuilder: An efficient Python library to setup quantum chemistry calculations on peptides models. PeerJ 2:e277 http://dx.doi.org/10.7717/peerj.277
 
 #### BASILISK:
@@ -116,7 +119,7 @@ Additional use of Open Babel should cite:
 
 Licensing
 =========
-FragBuilder is licensed under the two-clause BSD license which mean you can pretty much do whatever you want as long as you cite properly and/or mentions the name of the authors. 
+FragBuilder is licensed under the two-clause BSD license which mean you can pretty much do whatever you want as long as you cite properly and/or mentions the name of the authors.
 
 The BASILISK library which is included is licensed under the terms of the Gnu General Public License. Is also available from SourceForge: https://sourceforge.net/projects/basilisk-dbn/
 
