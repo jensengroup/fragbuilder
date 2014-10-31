@@ -24,6 +24,7 @@
 
 import numpy as np
 import math
+from numpy.linalg import norm
 
 RAD_TO_DEG = 180.0 / np.pi
 DEG_TO_RAD = np.pi / 180.0
@@ -34,8 +35,11 @@ def normalvector(v1, v2):
 
 # Vector perpendicular to (v1-v2) and (v3-v2) centered in v2.
 def perp_vector(v1, v2, v3):
-    J = np.cross(v2 - v3, v2 - v1) + v2
-    J = (J - v2) /(np.sqrt(np.dot(J - v2, J - v2))) + v2
+
+    J = np.cross(v2 - v3, v2 - v1)
+    J /= norm(J)
+    J += v2
+
     return J
 
 
